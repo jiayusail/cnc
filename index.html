@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>数控综合技能测试</title>
+<style>
+*{box-sizing:border-box;font-family:"Microsoft YaHei",sans-serif;}
+body{background:#f5f7fa;padding:20px;margin:0;}
+.container{max-width:950px;margin:0 auto;background:white;padding:30px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.1);}
+h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
+.mode-bar{display:flex;gap:10px;margin-bottom:20px;justify-content:center;}
+.mode-btn{padding:10px 20px;border:none;border-radius:6px;background:#e2e8f0;cursor:pointer;font-size:15px;}
+.mode-btn.active{background:#4299e1;color:white;}
+.progress-bar{height:8px;background:#e2e8f0;border-radius:4px;margin-bottom:15px;overflow:hidden;}
+.progress-inner{height:100%;background:#4299e1;width:0%;transition:0.3s;}
+.question{margin:16px 0;padding:14px;border-left:4px solid #4299e1;background:#f7fafc;border-radius:6px;}
+.q-title{font-weight:bold;margin-bottom:8px;color:#2d3748;}
+.option{margin:5px 0;cursor:pointer;padding:4px 8px;border-radius:4px;}
+.option:hover{background:#e8f4ff;}
+.analysis{font-size:14px;margin-top:8px;color:#4a5568;display:none;}
+.correct{background:#c6f6d5 !important;color:#22543d;}
+.wrong{background:#fed7d7 !important;color:#742a2a;}
+#result{margin-top:20px;padding:15px;border-radius:6px;font-size:18px;text-align:center;font-weight:bold;}
+.btns{display:flex;justify-content:center;gap:10px;margin-top:40px;padding-top:20px;border-top:1px solid #eee;flex-wrap:wrap;}
+.btns button{padding:10px 16px;border:none;border-radius:6px;font-size:15px;cursor:pointer;color:#333;}
+#submit{background:#cce5ff;}
+#reset{background:#e2e8f0;}
+#redo{background:#d9f9d9;}
+#change{background:#ffeaa7;}
+#prev{background:#e2e8f0;}
+#next{background:#cce5ff;}
+#allList{background:#ffeaa7;}
+#backTop{position:fixed;right:20px;bottom:20px;width:46px;height:46px;border:none;border-radius:50%;background:#666;color:#fff;font-size:20px;cursor:pointer;display:none;align-items:center;justify-content:center;}
+.list-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:999;}
+.list-box{background:white;padding:20px;border-radius:8px;max-height:80vh;overflow-y:auto;width:80%;max-width:600px;}
+.list-title{font-weight:bold;margin-bottom:10px;text-align:center;}
+.question-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:8px;}
+.question-grid button{padding:8px;border:none;border-radius:4px;background:#e2e8f0;cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="container">
+    <h1>数控综合技能测试（200题完整版）</h1>
+    <div class="mode-bar">
+        <button class="mode-btn active" data-mode="practice">练习模式</button>
+        <button class="mode-btn" data-mode="exam">考试模式</button>
+    </div>
+
+    <div class="progress-bar" id="progressWrap">
+        <div class="progress-inner" id="progressBar"></div>
+    </div>
+
+    <div id="questions"></div>
+    <div id="result"></div>
+
+    <div class="btns" id="examBtns" style="display:none;">
+        <button id="submit">提交答案</button>
+        <button id="reset">清空答案</button>
+        <button id="redo">重做错题</button>
+        <button id="change">更换题目</button>
+    </div>
+
+    <div class="btns" id="practiceBtns">
+        <button id="prev">上一题</button>
+        <button id="next">下一题</button>
+        <button id="allList">所有题目</button>
+    </div>
+</div>
+<button id="backTop">↑</button>
+
+<div class="list-modal" id="listModal">
+    <div class="list-box">
+        <div class="list-title">全部题目列表（共200题）</div>
+        <div class="question-grid" id="questionGrid"></div>
+    </div>
+</div>
+
+<script>
+const fullBank = [
+{"q":"1. 绝对坐标编程指令是","opt":["A.G90","B.G91","C.G54","D.G00"],"ans":"A","tip":"G90绝对坐标，G91增量坐标"},
+{"q":"2. 相对增量坐标编程指令是","opt":["A.G90","B.G91","C.G55","D.G01"],"ans":"B","tip":"G91为增量模式，以上一段为基准"},
+{"q":"3. 快速点定位指令","opt":["A.G01","B.G00","C.G02","D.G03"],"ans":"B","tip":"G00快速移动，非切削"},
+{"q":"4. 直线插补切削指令","opt":["A.G00","B.G01","C.G02","D.G03"],"ans":"B","tip":"G01直线切削，必须指定F"},
+{"q":"5. 顺时针圆弧插补指令","opt":["A.G01","B.G02","C.G03","D.G04"],"ans":"B","tip":"G02顺时针，G03逆时针"},
+{"q":"6. 逆时针圆弧插补指令","opt":["A.G01","B.G02","C.G03","D.G04"],"ans":"C","tip":"G03逆时针圆弧插补"},
+{"q":"7. 程序延时暂停指令","opt":["A.G04","B.G00","C.M05","D.M30"],"ans":"A","tip":"G04延时，X单位秒，P单位毫秒"},
+{"q":"8. 模态指令的特点是","opt":["A.仅本段有效","B.持续有效直到同组覆盖","C.只执行一次","D.程序结束失效"],"ans":"B","tip":"模态指令一旦指定持续有效"},
+{"q":"9. G54工件坐标系属于","opt":["A.非模态","B.模态","C.暂停指令","D.圆弧指令"],"ans":"B","tip":"G54~G59均为模态坐标系"},
+{"q":"10. 取消刀具半径补偿指令","opt":["A.G41","B.G42","C.G40","D.G43"],"ans":"C","tip":"G40取消半径补偿"},
+{"q":"11. 刀具长度正补偿指令","opt":["A.G43","B.G44","C.G49","D.G40"],"ans":"A","tip":"G43长度正补偿，G44负补偿"},
+{"q":"12. 取消刀具长度补偿指令","opt":["A.G40","B.G41","C.G49","D.G43"],"ans":"C","tip":"G49取消长度补偿"},
+{"q":"13. 刀具半径左补偿（沿进给方向）","opt":["A.G40","B.G41","C.G42","D.G43"],"ans":"B","tip":"G41左补偿，G42右补偿"},
+{"q":"14. 公制毫米单位指令","opt":["A.G20","B.G21","C.G90","D.G91"],"ans":"B","tip":"G21公制，G20英制"},
+{"q":"15. 英制英寸单位指令","opt":["A.G20","B.G21","C.G90","D.G91"],"ans":"A","tip":"G20英制单位"},
+{"q":"16. 主轴正转M代码","opt":["A.M03","B.M04","C.M05","D.M08"],"ans":"A","tip":"M03主轴正转"},
+{"q":"17. 主轴反转M代码","opt":["A.M03","B.M04","C.M05","D.M09"],"ans":"B","tip":"M04主轴反转"},
+{"q":"18. 主轴停止M代码","opt":["A.M03","B.M08","C.M05","D.M30"],"ans":"C","tip":"M05主轴停止"},
+{"q":"19. 程序结束并返回程序开头","opt":["A.M00","B.M01","C.M02","D.M30"],"ans":"D","tip":"M30结束并复位返回开头"},
+{"q":"20. 无条件程序暂停指令","opt":["A.M00","B.M01","C.M05","D.M08"],"ans":"A","tip":"M00必须按循环启动继续"},
+{"q":"21. 选择性程序暂停","opt":["A.M00","B.M01","C.M02","D.M30"],"ans":"B","tip":"M01需打开选择暂停开关才生效"},
+{"q":"22. 切削液开指令","opt":["A.M08","B.M09","C.M05","D.M03"],"ans":"A","tip":"M08开冷却液"},
+{"q":"23. 切削液关指令","opt":["A.M08","B.M09","C.M05","D.M04"],"ans":"B","tip":"M09关冷却液"},
+{"q":"24. 加工中心自动换刀指令","opt":["A.M06","B.M05","C.M30","D.G00"],"ans":"A","tip":"M06自动换刀"},
+{"q":"25. 子程序调用指令","opt":["A.G98","B.G99","C.M98","D.M99"],"ans":"C","tip":"M98调用子程序"},
+{"q":"26. 子程序结束返回主程序","opt":["A.M98","B.M99","C.M30","D.M02"],"ans":"B","tip":"M99子程序返回"},
+{"q":"27. 取消固定循环指令","opt":["A.G80","B.G81","C.G83","D.G84"],"ans":"A","tip":"G80取消所有钻孔固定循环"},
+{"q":"28. 主轴定向准停指令","opt":["A.M19","B.M05","C.M06","D.M30"],"ans":"A","tip":"M19主轴定向，用于换刀"},
+{"q":"29. 浅孔钻孔固定循环","opt":["A.G81","B.G83","C.G84","D.G85"],"ans":"A","tip":"G81普通钻孔循环"},
+{"q":"30. 深孔啄钻排屑循环","opt":["A.G81","B.G83","C.G84","D.G85"],"ans":"B","tip":"G83深孔钻，分段排屑"},
+{"q":"31. 右旋攻丝固定循环","opt":["A.G81","B.G83","C.G84","D.G85"],"ans":"C","tip":"G84攻丝循环"},
+{"q":"32. 精镗固定循环","opt":["A.G81","B.G83","C.G84","D.G85"],"ans":"D","tip":"G85精镗"},
+{"q":"33. 固定循环返回初始平面","opt":["A.G98","B.G99","C.G90","D.G91"],"ans":"A","tip":"G98返回初始平面"},
+{"q":"34. 固定循环返回R点平面","opt":["A.G98","B.G99","C.G54","D.G55"],"ans":"B","tip":"G99返回R点平面"},
+{"q":"35. G17选择哪个圆弧平面","opt":["A.XY平面","B.XZ平面","C.YZ平面","D.三维"],"ans":"A","tip":"G17 XY平面，默认平面"},
+{"q":"36. G18选择哪个圆弧平面","opt":["A.XY","B.XZ","C.YZ","D.无"],"ans":"B","tip":"G18 XZ平面"},
+{"q":"37. G19选择哪个圆弧平面","opt":["A.XY","B.XZ","C.YZ","D.无"],"ans":"C","tip":"G19 YZ平面"},
+{"q":"38. 程序中S代码含义","opt":["A.主轴转速","B.进给速度","C.刀具号","D.坐标"],"ans":"A","tip":"S主轴转速，单位r/min"},
+{"q":"39. 程序中F代码含义","opt":["A.进给速度","B.主轴转速","C.刀具","D.坐标"],"ans":"A","tip":"F进给速度，G94:mm/min"},
+{"q":"40. 程序中T代码含义","opt":["A.刀具号","B.主轴","C.进给","D.坐标"],"ans":"A","tip":"T代表刀具编号"},
+{"q":"41. 程序中H代码含义","opt":["A.长度补偿","B.半径补偿","C.主轴","D.冷却液"],"ans":"A","tip":"H刀具长度补偿地址"},
+{"q":"42. 程序中D代码含义","opt":["A.半径补偿","B.长度补偿","C.主轴","D.冷却液"],"ans":"A","tip":"D刀具半径补偿地址"},
+{"q":"43. 程序中R代码含义","opt":["A.圆弧半径/R点","B.转速","C.进给","D.刀具"],"ans":"A","tip":"R代表圆弧半径或安全高度"},
+{"q":"44. 程序中IJK含义","opt":["A.圆心增量坐标","B.转速","C.进给","D.补偿"],"ans":"A","tip":"IJK圆弧圆心相对于起点增量"},
+{"q":"45. 程序中P代码含义","opt":["A.延时时间","B.转速","C.进给","D.坐标"],"ans":"A","tip":"G04中P为毫秒延时"},
+{"q":"46. 程序中Q代码含义","opt":["A.每次切深","B.转速","C.进给","D.补偿"],"ans":"A","tip":"固定循环Q为每次切削深度"},
+{"q":"47. G52局部坐标系指令","opt":["A.模态","B.非模态","C.固定循环","D.补偿"],"ans":"B","tip":"G52非模态局部坐标设定"},
+{"q":"48. G68坐标旋转指令","opt":["A.模态","B.非模态","C.暂停","D.圆弧"],"ans":"A","tip":"G68模态坐标旋转"},
+{"q":"49. 取消坐标旋转指令","opt":["A.G69","B.G40","C.G80","D.G49"],"ans":"A","tip":"G69取消坐标旋转"},
+{"q":"50. G51.1开启镜像功能，取消用","opt":["A.G50.1","B.G40","C.G80","D.G49"],"ans":"A","tip":"G50.1取消镜像"},
+{"q":"51. G73高速深孔啄钻循环","opt":["A.固定循环","B.模态","C.补偿","D.坐标"],"ans":"A","tip":"G73高速分段深孔钻"},
+{"q":"52. G74左旋攻丝循环","opt":["A.固定循环","B.模态","C.补偿","D.坐标"],"ans":"A","tip":"G74用于左旋螺纹攻丝"},
+{"q":"53. G76精镗带定向让刀循环","opt":["A.固定循环","B.模态","C.补偿","D.坐标"],"ans":"A","tip":"G76精镗自动让刀，不伤孔壁"},
+{"q":"54. G82带暂停沉头钻孔","opt":["A.固定循环","B.模态","C.补偿","D.坐标"],"ans":"A","tip":"G82用于沉头孔，孔底暂停"},
+{"q":"55. G86镗孔循环（主轴停退刀）","opt":["A.固定循环","B.模态","C.补偿","D.坐标"],"ans":"A","tip":"G86镗孔，主轴停止后退刀"},
+{"q":"56. G94每分钟进给模式","opt":["A.模态","B.非模态","C.固定循环","D.补偿"],"ans":"A","tip":"G94默认模式，F单位mm/min"},
+{"q":"57. G95每转进给模式","opt":["A.模态","B.非模态","C.固定循环","D.补偿"],"ans":"A","tip":"G95 F单位mm/转，攻丝常用"},
+{"q":"58. G28返回参考点指令","opt":["A.非模态","B.模态","C.圆弧","D.补偿"],"ans":"A","tip":"G28单次执行回零"},
+{"q":"59. G30返回第二参考点","opt":["A.非模态","B.模态","C.圆弧","D.补偿"],"ans":"A","tip":"G30多用于换刀点设定"},
+{"q":"60. G65宏程序调用指令","opt":["A.非模态","B.模态","C.固定循环","D.补偿"],"ans":"A","tip":"G65单次调用宏程序"},
+{"q":"61. 加工中心Z轴一般对应","opt":["A.主轴上下","B.工作台前后","C.工作台左右","D.第四轴"],"ans":"A","tip":"Z轴主轴上下运动"},
+{"q":"62. 立式加工中心X轴一般是","opt":["A.工作台左右","B.前后","C.主轴上下","D.旋转轴"],"ans":"A","tip":"X轴工作台左右移动"},
+{"q":"63. 立式加工中心Y轴一般是","opt":["A.工作台前后","B.左右","C.主轴上下","D.旋转"],"ans":"A","tip":"Y轴工作台前后移动"},
+{"q":"64. 机床回参考点目的是","opt":["A.建立机械坐标系","B.开主轴","C.开冷却液","D.换刀"],"ans":"A","tip":"回零建立机械原点"},
+{"q":"65. 机床超程报警正确处理","opt":["A.手动反向移动解除","B.关机重启","C.直接复位","D.不管"],"ans":"A","tip":"超程后手动反向移出限位"},
+{"q":"66. 加工中心刀库类型最常见是","opt":["A.斗笠式/圆盘式","B.链条式","C.排式","D.直线式"],"ans":"A","tip":"立式机常用斗笠刀库"},
+{"q":"67. 主轴锥度最常用型号","opt":["A.BT40","B.ER32","C.莫氏2号","D.ER25"],"ans":"A","tip":"BT40立式加工中心标配"},
+{"q":"68. 机床润滑油主要作用不包括","opt":["A.导电","B.润滑","C.冷却","D.防锈"],"ans":"A","tip":"润滑油不导电"},
+{"q":"69. 机床气压压力一般设定为","opt":["A.0.5~0.7MPa","B.1.0MPa以上","C.0.1MPa","D.负压"],"ans":"A","tip":"机床标准气压0.5~0.7MPa"},
+{"q":"70. 加工中心第四轴一般是","opt":["A.A轴旋转","B.B轴","C.C轴","D.Z轴"],"ans":"A","tip":"第四轴A轴绕X旋转"},
+{"q":"71. 机床绝对式编码器开机是否需要回零","opt":["A.不需要","B.必须回零","C.偶尔回零","D.不确定"],"ans":"A","tip":"绝对值编码器开机不用回零"},
+{"q":"72. 机床相对式编码器开机","opt":["A.必须回参考点","B.不用回零","C.直接加工","D.自动回零"],"ans":"A","tip":"增量式编码器开机必须回零"},
+{"q":"73. 主轴跳动过大不会导致","opt":["A.效率变高","B.光洁度差","C.刀具易断","D.尺寸不稳"],"ans":"A","tip":"主轴跳动只会降低加工质量"},
+{"q":"74. 机床急停按钮按下后状态","opt":["A.所有轴停止锁定","B.主轴继续转","C.冷却液继续开","D.程序继续跑"],"ans":"A","tip":"急停切断所有动力"},
+{"q":"75. 加工中心换刀时主轴必须","opt":["A.定向准停","B.高速旋转","C.低速旋转","D.随意"],"ans":"A","tip":"M19主轴定向才能换刀"},
+{"q":"76. 机床坐标系原点是","opt":["A.机械原点","B.工件原点","C.任意点","D.夹具原点"],"ans":"A","tip":"机械原点由行程开关确定"},
+{"q":"77. 工件坐标系G54原点一般设在","opt":["A.工件中心或角点","B.机床原点","C.刀位点","D.主轴端面"],"ans":"A","tip":"G54原点设在工件方便对刀位置"},
+{"q":"78. 机床硬限位作用是","opt":["A.防止超程撞机","B.定位","C.换刀","D.夹紧"],"ans":"A","tip":"硬限位保护机床超程"},
+{"q":"79. 加工中心三轴联动含义","opt":["A.XYZ同时运动","B.只有X动","C.只有Y动","D.只有Z动"],"ans":"A","tip":"三轴联动XYZ同步插补"},
+{"q":"80. 机床丝杠间隙会造成","opt":["A.反向尺寸误差","B.主轴不转","C.冷却液不出","D.刀库乱刀"],"ans":"A","tip":"丝杠间隙换向时尺寸偏差"},
+{"q":"81. 刀库乱刀主要原因","opt":["A.计数信号丢失","B.主轴损坏","C.冷却液不足","D.气压过高"],"ans":"A","tip":"刀库感应开关故障易乱刀"},
+{"q":"82. 机床伺服电机作用是","opt":["A.驱动坐标轴运动","B.带动主轴","C.控制刀库","D.控制冷却液"],"ans":"A","tip":"伺服电机驱动XYZ轴进给"},
+{"q":"83. 滚珠丝杠相比普通丝杠优点","opt":["A.摩擦小效率高","B.成本低","C.易磨损","D.刚性差"],"ans":"A","tip":"滚珠丝杠传动效率高、精度高"},
+{"q":"84. 直线导轨相比硬轨优点","opt":["A.移动轻快速度快","B.刚性更好","C.抗冲击强","D.价格便宜"],"ans":"A","tip":"直线导轨适合高速轻载加工"},
+{"q":"85. 硬轨相比线轨优点","opt":["A.刚性好抗冲击","B.移动轻快","C.速度快","D.不易积屑"],"ans":"A","tip":"硬轨适合开粗重切削"},
+{"q":"86. 机床散热不良最容易导致","opt":["A.热变形尺寸漂移","B.主轴停转","C.刀库卡死","D.气压不足"],"ans":"A","tip":"温度变化会让机床变形"},
+{"q":"87. 加工中心对刀仪主要作用","opt":["A.自动测量刀具长度","B.测量工件尺寸","C.找正工件","D.检测光洁度"],"ans":"A","tip":"对刀仪自动测刀长补偿"},
+{"q":"88. 百分表常用于","opt":["A.找正工件与检测跳动","B.钻孔","C.铣削","D.攻丝"],"ans":"A","tip":"百分表找正、测同轴度、跳动"},
+{"q":"89. 寻边器作用是","opt":["A.找工件中心","B.测刀具长度","C.测深度","D.测粗糙度"],"ans":"A","tip":"寻边器快速找工件XY中心"},
+{"q":"90. Z轴设定器用于","opt":["A.设定Z轴工件零点","B.找XY中心","C.测刀具半径","D.测跳动"],"ans":"A","tip":"Z轴设定器对Z轴零点"},
+{"q":"91. 机床气压过低会导致","opt":["A.换刀夹刀不稳","B.主轴不转","C.程序报错","D.坐标漂移"],"ans":"A","tip":"气压不足影响刀库、松刀动作"},
+{"q":"92. 松刀信号异常会造成","opt":["A.掉刀或换刀卡死","B.主轴过热","C.冷却液不出","D.伺服报警"],"ans":"A","tip":"松刀不到位极易引发掉刀事故"},
+{"q":"93. 伺服过载报警原因一般是","opt":["A.负载过大或机械卡死","B.电压过高","C.冷却液过多","D.程序错误"],"ans":"A","tip":"撞刀、铁屑卡死易引发伺服过载"},
+{"q":"94. 机床绝对坐标与相对坐标区别","opt":["A.绝对以机械原点为基准","B.无区别","C.相对固定不变","D.绝对不断变化"],"ans":"A","tip":"绝对坐标参考机械原点"},
+{"q":"95. 加工中心第四轴分度单位一般是","opt":["A.度","B.毫米","C.英寸","D.转"],"ans":"A","tip":"第四轴A以角度为单位"},
+{"q":"96. 机床参数1850主要设置","opt":["A.丝杠间隙补偿","B.主轴转速","C.进给速度","D.刀具补偿"],"ans":"A","tip":"1850参数设置反向间隙"},
+{"q":"97. 刀具长度补偿参数号范围一般是","opt":["A.H01~H200","B.D01~D200","C.G54~G59","D.M03~M30"],"ans":"A","tip":"H为长度补偿地址"},
+{"q":"98. 刀具半径补偿参数号范围一般是","opt":["A.D01~D200","B.H01~H200","C.G代码","D.M代码"],"ans":"A","tip":"D为半径补偿地址"},
+{"q":"99. 机床开机第一步通常是","opt":["A.回参考点","B.直接加工","C.打开冷却液","D.启动主轴"],"ans":"A","tip":"增量式编码器必须先回零"},
+{"q":"100. 加工完成后正确关机顺序","opt":["A.停止程序→回零→关主轴→关冷却→关机","B.直接关机","C.直接断电","D.只关冷却"],"ans":"A","tip":"规范关机可保护机床寿命"},
+{"q":"101. 第四轴回零指令一般使用","opt":["A.G28 A0","B.G00 A0","C.G01 A0","D.G90 A0"],"ans":"A","tip":"G28带A轴实现第四轴回零"},
+{"q":"102. 机床热机目的是","opt":["A.让机床温度稳定减少变形","B.预热刀具","C.预热工件","D.预热冷却液"],"ans":"A","tip":"开机热机减少尺寸漂移"},
+{"q":"103. 主轴皮带传动相比直连主轴特点","opt":["A.减震好噪音小","B.转速更高","C.刚性更强","D.精度更高"],"ans":"A","tip":"皮带主轴减震好，适合开粗"},
+{"q":"104. 直连主轴特点","opt":["A.转速高精度高","B.减震好","C.扭矩大","D.抗冲击强"],"ans":"A","tip":"直连主轴适合高速精加工"},
+{"q":"105. 电主轴最大优势是","opt":["A.转速极高","B.扭矩大","C.价格便宜","D.维护简单"],"ans":"A","tip":"电主轴可达几万转，适合高速雕铣"},
+{"q":"106. 机床导轨油不足会导致","opt":["A.移动抖动发热","B.主轴停转","C.冷却液不出","D.气压不足"],"ans":"A","tip":"缺油加剧导轨磨损"},
+{"q":"107. 加工中心冷却液主要作用不包括","opt":["A.防锈机床本体","B.冷却刀具工件","C.排屑","D.润滑切削"],"ans":"A","tip":"冷却液主要用于切削冷却排屑"},
+{"q":"108. 乳化液适合加工","opt":["A.钢件、铸铁","B.铝件精加工","C.不锈钢","D.钛合金"],"ans":"A","tip":"乳化液冷却润滑均衡"},
+{"q":"109. 切削油适合加工","opt":["A.不锈钢、合金钢","B.铝件","C.铸铁","D.铜件"],"ans":"A","tip":"切削油润滑性极强，防粘刀"},
+{"q":"110. 水性冷却液优点是","opt":["A.冷却速度快","B.润滑极强","C.不易变质","D.价格高"],"ans":"A","tip":"水性冷却液冷却效果最佳"},
+{"q":"111. 立铣刀侧刃主要用于","opt":["A.铣侧壁","B.铣底面","C.钻孔","D.攻丝"],"ans":"A","tip":"侧刃切削侧壁轮廓"},
+{"q":"112. 立铣刀底刃主要用于","opt":["A.铣平面/开槽","B.铣侧壁","C.攻丝","D.镗孔"],"ans":"A","tip":"底刃用于平面、开槽加工"},
+{"q":"113. 钻头主切削刃数量一般是","opt":["A.2条","B.1条","C.3条","D.4条"],"ans":"A","tip":"麻花钻两条主切削刃"},
+{"q":"114. 丝锥主要用于","opt":["A.攻内螺纹","B.铣螺纹","C.钻孔","D.镗孔"],"ans":"A","tip":"丝锥加工内螺纹"},
+{"q":"115. 镗刀主要用于","opt":["A.精加工内孔","B.钻孔","C.铣面","D.攻丝"],"ans":"A","tip":"镗刀保证内孔精度与光洁度"},
+{"q":"116. 加工铝件最适合刀具材料","opt":["A.硬质合金无涂层","B.涂层硬质合金","C.高速钢","D.陶瓷"],"ans":"A","tip":"铝件用无涂层硬质合金防粘刀"},
+{"q":"117. 加工钢件优先选用刀具涂层","opt":["A.TiN/TiCN","B.无涂层","C.金刚石","D.氮化硼"],"ans":"A","tip":"TiN涂层适合钢件切削"},
+{"q":"118. 刀具悬伸过长会造成","opt":["A.震刀、尺寸差","B.效率提高","C.光洁度变好","D.不易断刀"],"ans":"A","tip":"悬伸越长刚性越差易震刀"},
+{"q":"119. 平底刀与球刀区别","opt":["A.平底刀尖角90°，球刀圆弧","B.无区别","C.材质不同","D.涂层不同"],"ans":"A","tip":"球刀用于曲面加工"},
+{"q":"120. 牛鼻刀（圆鼻刀）特点","opt":["A.刀尖带圆弧刚性好","B.只能精加工","C.只能钻孔","D.只能攻丝"],"ans":"A","tip":"牛鼻刀开粗半精常用，刚性优于球刀"},
+{"q":"121. 高速钢刀具特点","opt":["A.韧性好、耐热差","B.硬度极高","C.耐热1000度以上","D.适合高速切削"],"ans":"A","tip":"高速钢韧性好适合低速加工"},
+{"q":"122. 硬质合金刀具特点","opt":["A.硬度高适合高速","B.韧性极好","C.易崩刃","D.只适合低速"],"ans":"A","tip":"硬质合金适合高速切削加工"},
+{"q":"123. 刀具磨损最主要位置","opt":["A.后刀面","B.前刀面","C.刀尖","D.侧刃"],"ans":"A","tip":"正常磨损主要在后刀面"},
+{"q":"124. 加工不锈钢易出现问题","opt":["A.粘刀、加工硬化","B.光洁度极好","C.不易磨损","D.排屑顺畅"],"ans":"A","tip":"不锈钢加工硬化易粘刀"},
+{"q":"125. 刀具齿数越多一般","opt":["A.进给可越大","B.进给越小","C.转速越低","D.刚性越差"],"ans":"A","tip":"齿数多每齿进给更小，整体进给更高"},
+{"q":"126. 顺铣特点是","opt":["A.刀具顺着工件转动方向","B.逆着方向","C.只适合粗加工","D.易打刀"],"ans":"A","tip":"顺铣光洁度好，机床有间隙慎用"},
+{"q":"127. 逆铣特点是","opt":["A.适合间隙大机床","B.光洁度好","C.适合精加工","D.排屑好"],"ans":"A","tip":"逆铣抵消丝杠间隙"},
+{"q":"128. 深孔加工刀具必须具备","opt":["A.良好排屑槽","B.短刃","C.大直径","D.高硬度"],"ans":"A","tip":"深孔重点是排屑顺畅"},
+{"q":"129. 丝锥加工时必须开启","opt":["A.冷却液","B.高速转速","C.大进给","D.干切"],"ans":"A","tip":"攻丝必须充分冷却润滑"},
+{"q":"130. 刀具补偿H/D值一般设置在","opt":["A.刀具偏置页面","B.程序里","C.机床参数","D.宏变量"],"ans":"A","tip":"H/D补偿值在刀具偏置界面设定"},
+{"q":"131. 每齿进给fz计算公式是","opt":["A.fz=F/(Z*S)","B.fz=F*Z*S","C.fz=S/Z","D.fz=Z/S"],"ans":"A","tip":"每齿进给等于进给除以齿数与转速乘积"},
+{"q":"132. 线速度Vc计算公式","opt":["A.Vc=πDS/1000","B.Vc=D*S","C.Vc=S/D","D.Vc=D/S"],"ans":"A","tip":"线速度常用公式，单位m/min"},
+{"q":"133. 开粗加工优先选择","opt":["A.大切深大进给低转速","B.小切深高转速","C.高转速小进给","D.任意参数"],"ans":"A","tip":"开粗重切削优先保证效率"},
+{"q":"134. 精加工优先选择","opt":["A.小切深高转速大进给","B.大切深低转速","C.低转速小进给","D.任意参数"],"ans":"A","tip":"精加工优先保证光洁度与尺寸"},
+{"q":"135. 铝件加工转速一般","opt":["A.偏高","B.偏低","C.极低","D.固定不变"],"ans":"A","tip":"铝件适合高速切削，防粘刀"},
+{"q":"136. 铸铁加工特点","opt":["A.脆性大排屑好","B.易粘刀","C.加工硬化严重","D.需要大量切削油"],"ans":"A","tip":"铸铁干切也可，排屑呈粉末状"},
+{"q":"137. 钛合金加工难点","opt":["A.导热差易粘刀","B.硬度低","C.易切削","D.排屑顺畅"],"ans":"A","tip":"钛合金导热差，极易烧刀"},
+{"q":"138. 金刚石刀具最适合加工","opt":["A.铝合金、铜合金","B.钢件","C.不锈钢","D.铸铁"],"ans":"A","tip":"PCD刀具适合有色金属高光加工"},
+{"q":"139. CBN立方氮化硼适合加工","opt":["A.淬火钢、高硬度材料","B.铝件","C.铜件","D.塑料"],"ans":"A","tip":"CBN专门加工淬硬钢"},
+{"q":"140. 立铣刀悬伸长度一般不超过","opt":["A.3倍刀具直径","B.5倍","C.10倍","D.任意"],"ans":"A","tip":"悬伸超过3倍刚性急剧下降"},
+{"q":"141. 开槽加工侧吃刀量一般","opt":["A.等于刀具直径","B.小于直径一半","C.任意","D.很小"],"ans":"A","tip":"开槽满刃切削，注意降低参数"},
+{"q":"142. 轮廓铣削侧吃刀量一般","opt":["A.小于刀具直径一半","B.等于直径","C.大于直径","D.任意"],"ans":"A","tip":"侧吃小，刀具受力小更稳定"},
+{"q":"143. 攻丝时转速必须","opt":["A.偏低","B.偏高","C.极高","D.任意"],"ans":"A","tip":"攻丝转速过高极易断锥"},
+{"q":"144. 盲孔攻丝深度要小于丝锥有效长度","opt":["A.是","B.否","C.无所谓","D.看情况"],"ans":"A","tip":"防止丝锥尾部无牙段撞底折断"},
+{"q":"145. 铣螺纹常用指令","opt":["A.G01螺旋插补","B.G84攻丝","C.G02圆弧","D.G00快速"],"ans":"A","tip":"用G01三轴联动铣螺纹"},
+{"q":"146. 型腔开粗优先采用","opt":["A.动态铣削","B.分层铣削","C.单向铣削","D.往复铣削"],"ans":"A","tip":"动态铣削刀具受力小，不易崩刀"},
+{"q":"147. 曲面精加工优先使用","opt":["A.球刀","B.平底刀","C.牛鼻刀","D.钻头"],"ans":"A","tip":"球刀适合曲面仿形加工"},
+{"q":"148. 平面精加工常用","opt":["A.大直径盘刀","B.小立铣刀","C.球刀","D.丝锥"],"ans":"A","tip":"盘刀效率高，平面光洁度好"},
+{"q":"149. 刀具热胀刀柄优势","opt":["A.夹持刚性高同心度好","B.便宜","C.装卸方便","D.维护简单"],"ans":"A","tip":"热胀刀柄适合高速精加工"},
+{"q":"150. ER弹簧夹头特点","opt":["A.通用性强夹持范围大","B.刚性极高","C.同心度最好","D.只适合大刀具"],"ans":"A","tip":"ER刀柄加工中心最通用刀柄"},
+{"q":"151. 尺寸公差含义是","opt":["A.允许尺寸变动范围","B.固定尺寸","C.最大尺寸","D.最小尺寸"],"ans":"A","tip":"公差=上偏差-下偏差"},
+{"q":"152. 图纸中Φ代表","opt":["A.直径","B.半径","C.长度","D.角度"],"ans":"A","tip":"Φ表示直径尺寸"},
+{"q":"153. 图纸中R代表","opt":["A.半径","B.直径","C.角度","D.深度"],"ans":"A","tip":"R表示圆弧半径"},
+{"q":"154. 表面粗糙度Ra数值越小","opt":["A.表面越光滑","B.越粗糙","C.无影响","D.加工越快"],"ans":"A","tip":"Ra数值越小光洁度越高"},
+{"q":"155. 形位公差中⊥代表","opt":["A.垂直度","B.平行度","C.圆度","D.同轴度"],"ans":"A","tip":"⊥垂直度符号"},
+{"q":"156. 形位公差中∥代表","opt":["A.平行度","B.垂直度","C.位置度","D.跳动"],"ans":"A","tip":"∥平行度符号"},
+{"q":"157. 形位公差中◎代表","opt":["A.同轴度","B.圆度","C.平面度","D.跳动"],"ans":"A","tip":"◎同轴度/同心度"},
+{"q":"158. 图纸中基准A/B/C作用是","opt":["A.作为测量参考","B.装饰","C.随便标","D.无意义"],"ans":"A","tip":"基准是形位公差测量基准"},
+{"q":"159. 未注公差按国标默认等级","opt":["A.IT12~IT14","B.IT01","C.IT1","D.IT5"],"ans":"A","tip":"自由公差IT12~IT14级"},
+{"q":"160. 倒角C2含义是","opt":["A.2×45°倒角","B.圆角2mm","C.深度2mm","D.角度2度"],"ans":"A","tip":"C2=2毫米45度倒角"},
+{"q":"161. 图纸中TYP含义是","opt":["A.相同结构多处","B.深度","C.公差","D.角度"],"ans":"A","tip":"TYP表示多处相同特征"},
+{"q":"162. 沉头孔符号含义是","opt":["A.埋头螺丝孔","B.通孔","C.盲孔","D.螺纹孔"],"ans":"A","tip":"沉头孔用于螺丝沉入工件"},
+{"q":"163. 盲孔与通孔区别","opt":["A.不通穿/通穿","B.大小不同","C.材质不同","D.深度不同"],"ans":"A","tip":"盲孔不打通，通孔打通"},
+{"q":"164. 螺纹M6含义是","opt":["A.公称直径6mm螺纹","B.深度6","C.公差6","D.角度6"],"ans":"A","tip":"M代表普通公制螺纹"},
+{"q":"165. 图纸剖面线作用","opt":["A.表示实体剖切","B.装饰","C.尺寸线","D.中心线"],"ans":"A","tip":"剖面线表示剖切到实体部分"},
+{"q":"166. 中心线作用是","opt":["A.对称/圆心定位","B.尺寸线","C.轮廓线","D.剖面线"],"ans":"A","tip":"中心线用于圆心、对称轴"},
+{"q":"167. 零件配合间隙越大","opt":["A.越容易装配","B.精度越高","C.越紧","D.越耐磨"],"ans":"A","tip":"间隙大装配轻松但精度差"},
+{"q":"168. 过盈配合一般用于","opt":["A.无相对转动装配","B.滑动配合","C.间隙配合","D.螺纹连接"],"ans":"A","tip":"过盈配合用于固定装配"},
+{"q":"169. 角度标注单位默认是","opt":["A.度","B.分","C.秒","D.弧度"],"ans":"A","tip":"图纸角度默认单位度"},
+{"q":"170. 图纸尺寸单位未标注时默认","opt":["A.mm","B.cm","C.m","D.英寸"],"ans":"A","tip":"机械图纸默认毫米"},
+{"q":"171. 尺寸链封闭环是","opt":["A.最后间接保证尺寸","B.直接加工尺寸","C.基准尺寸","D.公差"],"ans":"A","tip":"封闭环是间接形成的尺寸"},
+{"q":"172. 跳动公差分为","opt":["A.圆跳动与全跳动","B.只有圆跳动","C.只有全跳动","D.平面跳动"],"ans":"A","tip":"跳动分圆跳动和全跳动"},
+{"q":"173. 平面度属于","opt":["A.形状公差","B.位置公差","C.尺寸公差","D.跳动公差"],"ans":"A","tip":"平面度属于形状公差"},
+{"q":"174. 位置度属于","opt":["A.位置公差","B.形状公差","C.尺寸公差","D.表面公差"],"ans":"A","tip":"位置度控制孔位置精度"},
+{"q":"175. 图纸中MAX/MIN含义","opt":["A.最大/最小","B.平均","C.公差","D.基准"],"ans":"A","tip":"MAX最大，MIN最小"},
+{"q":"176. 局部放大图作用","opt":["A.看清细小结构","B.装饰","C.改尺寸","D.改公差"],"ans":"A","tip":"放大细小结构方便标注"},
+{"q":"177. 斜度符号表示","opt":["A.斜面倾斜程度","B.圆弧","C.深度","D.角度"],"ans":"A","tip":"斜度表示斜面倾斜比例"},
+{"q":"178. 锥度符号表示","opt":["A.圆锥大小头比例","B.斜度","C.深度","D.角度"],"ans":"A","tip":"锥度用于圆锥类零件"},
+{"q":"179. 零件表面淬火目的","opt":["A.提高表面硬度","B.整体变软","C.消除应力","D.防锈"],"ans":"A","tip":"表面淬火只提高表面硬度"},
+{"q":"180. 时效处理目的","opt":["A.消除内应力防变形","B.提高硬度","C.提高韧性","D.防锈"],"ans":"A","tip":"时效消除应力防止加工变形"},
+{"q":"181. 调质处理是指","opt":["A.淬火+高温回火","B.正火","C.退火","D.表面淬火"],"ans":"A","tip":"调质获得良好综合力学性能"},
+{"q":"182. 退火主要作用","opt":["A.软化材料便于切削","B.提高硬度","C.提高强度","D.提高韧性"],"ans":"A","tip":"退火降低硬度，改善切削性"},
+{"q":"183. 正火相比退火优点","opt":["A.效率更高成本低","B.更软","C.应力更小","D.更易切削"],"ans":"A","tip":"正火冷却快，生产效率高"},
+{"q":"184. 铝合金常用热处理","opt":["A.固溶+时效","B.淬火","C.调质","D.退火"],"ans":"A","tip":"铝合金通过时效提高强度"},
+{"q":"185. 工装夹具主要作用不包括","opt":["A.提高零件硬度","B.定位工件","C.夹紧工件","D.提高效率"],"ans":"A","tip":"夹具只负责定位夹紧"},
+{"q":"186. 平口钳适合夹持","opt":["A.规则矩形工件","B.异形件","C.大型板件","D.曲面件"],"ans":"A","tip":"平口钳加工中心最通用夹具"},
+{"q":"187. 真空吸盘适合夹持","opt":["A.薄板铝板铜板","B.厚重钢件","C.异形件","D.带孔工件"],"ans":"A","tip":"真空吸盘夹持薄板不变形"},
+{"q":"188. 四爪卡盘适合夹持","opt":["A.圆形偏心工件","B.规则方料","C.板料","D.铝件"],"ans":"A","tip":"四爪找正偏心圆件"},
+{"q":"189. 工装定位原则是","opt":["A.六点定位原理","B.三点定位","C.随意定位","D.两点定位"],"ans":"A","tip":"六点完全定位限制所有自由度"},
+{"q":"190. 过定位是指","opt":["A.同一自由度被重复限制","B.定位不足","C.没有定位","D.两点定位"],"ans":"A","tip":"过定位易导致装夹变形"},
+{"q":"191. 欠定位是指","opt":["A.必要自由度未被限制","B.过定位","C.完全定位","D.重复定位"],"ans":"A","tip":"欠定位无法保证加工精度"},
+{"q":"192. 夹紧力方向应尽量","opt":["A.垂直于主要定位面","B.平行","C.倾斜","D.任意"],"ans":"A","tip":"夹紧力垂直定位面更稳定"},
+{"q":"193. 粗基准选择原则是","opt":["A.选择不加工表面","B.选择已加工面","C.任意","D.选择小孔"],"ans":"A","tip":"粗基准优先选不加工表面"},
+{"q":"194. 精基准选择原则是","opt":["A.基准重合原则","B.粗基准原则","C.任意","D.选择毛坯面"],"ans":"A","tip":"精基准尽量与设计基准重合"},
+{"q":"195. 工序集中优点是","opt":["A.减少装夹提高效率","B.设备利用率低","C.精度差","D.人员需求多"],"ans":"A","tip":"加工中心天然适合工序集中"},
+{"q":"196. 工序分散特点是","opt":["A.设备多人员多","B.装夹次数少","C.效率高","D.精度稳定"],"ans":"A","tip":"工序分散适合大批量流水线"},
+{"q":"197. 零件加工顺序一般是","opt":["A.先粗后精先面后孔","B.先孔后面","C.先精后粗","D.随意"],"ans":"A","tip":"先开粗再精加工，先铣面再钻孔"},
+{"q":"198. 孔加工顺序一般是","opt":["A.中心钻→钻孔→扩孔→铰孔","B.直接铰孔","C.直接钻孔","D.任意"],"ans":"A","tip":"中心钻定点防止钻头跑偏"},
+{"q":"199. 薄壁件加工关键是","opt":["A.减小切削力防止变形","B.提高转速","C.加大进给","D.加大切深"],"ans":"A","tip":"薄壁件极易变形，轻切快进"},
+{"q":"200. 加工中心安全操作第一原则是","opt":["A.开机前检查确认安全","B.直接运行程序","C.边玩手机边加工","D.随意修改参数"],"ans":"A","tip":"安全永远是数控加工第一位"}
+];
+
+const pageSizeExam = 25;
+let mode = "practice";
+let currentExamList = [];
+let wrongList = [];
+let currentPracticeIndex = 0;
+const box = document.getElementById('questions');
+const progressWrap = document.getElementById('progressWrap');
+const progressBar = document.getElementById('progressBar');
+const examBtns = document.getElementById('examBtns');
+const practiceBtns = document.getElementById('practiceBtns');
+const listModal = document.getElementById('listModal');
+const questionGrid = document.getElementById('questionGrid');
+const backTopBtn = document.getElementById('backTop');
+
+document.querySelectorAll('.mode-btn').forEach(btn=>{
+    btn.onclick = ()=>{
+        document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        mode = btn.dataset.mode;
+        wrongList = [];
+        if(mode==="practice"){
+            examBtns.style.display = "none";
+            practiceBtns.style.display = "flex";
+            progressWrap.style.display = "block";
+            currentPracticeIndex = 0;
+            renderPractice();
+        }else{
+            examBtns.style.display = "flex";
+            practiceBtns.style.display = "none";
+            progressWrap.style.display = "none";
+            getNewExamBatch();
+            renderExam();
+        }
+        document.getElementById('result').innerText = "";
+    }
+});
+
+function shuffle(arr){
+    let a=[...arr];
+    for(let i=a.length-1;i>0;i--){
+        let j=Math.floor(Math.random()*(i+1));
+        [a[i],a[j]]=[a[j],a[i]];
+    }
+    return a;
+}
+function getNewExamBatch(){
+    currentExamList = shuffle(fullBank).slice(0,pageSizeExam);
+}
+function renderExam(){
+    box.innerHTML="";
+    wrongList=[];
+    currentExamList.forEach((item,i)=>{
+        let div=document.createElement('div');
+        div.className='question';
+        div.innerHTML=`<div class="q-title">${i+1}. ${item.q}</div>`;
+        item.opt.forEach(o=>{
+            div.innerHTML+=`<div class="option"><input type="radio" name="q${i}" value="${o.charAt(0)}"> ${o}</div>`;
+        });
+        div.innerHTML+=`<div class="analysis">解析：${item.tip}</div>`;
+        box.appendChild(div);
+    });
+    document.getElementById('result').innerText="";
+}
+
+function renderPractice(){
+    box.innerHTML="";
+    let item = fullBank[currentPracticeIndex];
+    let div=document.createElement('div');
+    div.className='question';
+    div.innerHTML=`<div class="q-title">第${currentPracticeIndex+1}题：${item.q}</div>`;
+    item.opt.forEach(o=>{
+        div.innerHTML+=`<div class="option"><input type="radio" name="p" value="${o.charAt(0)}"> ${o}</div>`;
+    });
+    div.innerHTML+=`<div class="analysis">解析：${item.tip}</div>`;
+    box.appendChild(div);
+    let percent = ((currentPracticeIndex+1)/fullBank.length*100).toFixed(1);
+    progressBar.style.width = percent+"%";
+}
+
+function initQuestionList(){
+    questionGrid.innerHTML="";
+    for(let i=0;i<200;i++){
+        let btn=document.createElement('button');
+        btn.innerText=i+1;
+        btn.onclick=()=>{
+            currentPracticeIndex=i;
+            renderPractice();
+            listModal.style.display="none";
+        };
+        questionGrid.appendChild(btn);
+    }
+}
+
+document.getElementById('submit').onclick=()=>{
+    let right=0;
+    wrongList=[];
+    document.querySelectorAll('.question').forEach((dom,i)=>{
+        let sel=dom.querySelector('input:checked');
+        let ans=currentExamList[i].ans;
+        let tip=dom.querySelector('.analysis');
+        dom.classList.remove('correct','wrong');
+        tip.style.display='block';
+        if(sel&&sel.value===ans){
+            right++;
+            dom.classList.add('correct');
+        }else{
+            dom.classList.add('wrong');
+            wrongList.push(currentExamList[i]);
+        }
+    });
+    let score = (right/pageSizeExam*100).toFixed(1);
+    document.getElementById('result').innerText=`得分：${score} 分（答对${right}/${pageSizeExam}题，错题${wrongList.length}题）`;
+};
+document.getElementById('reset').onclick=()=>{
+    document.querySelectorAll('input[type=radio]').forEach(r=>r.checked=false);
+    document.querySelectorAll('.question').forEach(d=>{
+        d.classList.remove('correct','wrong');
+        d.querySelector('.analysis').style.display='none';
+    });
+    document.getElementById('result').innerText="";
+};
+document.getElementById('redo').onclick=()=>{
+    if(wrongList.length===0){alert("暂无错题，请先提交试卷");return;}
+    currentExamList = [...wrongList];
+    renderExam();
+    document.getElementById('result').innerText=`当前错题重做模式，共${currentExamList.length}题`;
+};
+document.getElementById('change').onclick=()=>{
+    getNewExamBatch();
+    renderExam();
+};
+document.getElementById('prev').onclick=()=>{
+    if(currentPracticeIndex>0){
+        currentPracticeIndex--;
+        renderPractice();
+    }
+};
+document.getElementById('next').onclick=()=>{
+    if(currentPracticeIndex<199){
+        currentPracticeIndex++;
+        renderPractice();
+    }
+};
+document.getElementById('allList').onclick=()=>{
+    listModal.style.display="flex";
+};
+listModal.onclick=(e)=>{
+    if(e.target===listModal) listModal.style.display="none";
+};
+window.addEventListener('scroll',()=>{
+    backTopBtn.style.display = window.scrollY>300 ? 'flex' : 'none';
+});
+backTopBtn.onclick=()=>{
+    window.scrollTo({top:0,behavior:'smooth'});
+};
+
+initQuestionList();
+currentPracticeIndex=0;
+renderPractice();
+</script>
+</body>
+</html>
