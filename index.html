@@ -2,13 +2,15 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
+<!-- 手机自适应核心代码（已添加） -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>数控综合技能测试</title>
 <style>
 *{box-sizing:border-box;font-family:"Microsoft YaHei",sans-serif;}
 body{background:#f5f7fa;padding:20px;margin:0;}
 .container{max-width:950px;margin:0 auto;background:white;padding:30px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.1);}
 h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
-.mode-bar{display:flex;gap:10px;margin-bottom:20px;justify-content:center;}
+.mode-bar{display:flex;gap:10px;margin-bottom:20px;justify-content:center;flex-wrap:wrap;}
 .mode-btn{padding:10px 20px;border:none;border-radius:6px;background:#e2e8f0;cursor:pointer;font-size:15px;}
 .mode-btn.active{background:#4299e1;color:white;}
 .progress-bar{height:8px;background:#e2e8f0;border-radius:4px;margin-bottom:15px;overflow:hidden;}
@@ -36,6 +38,16 @@ h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
 .list-title{font-weight:bold;margin-bottom:10px;text-align:center;}
 .question-grid{display:grid;grid-template-columns:repeat(10,1fr);gap:8px;}
 .question-grid button{padding:8px;border:none;border-radius:4px;background:#e2e8f0;cursor:pointer;}
+
+/* 手机端自适应优化（已添加） */
+@media (max-width:767px){
+  .container{padding:15px;}
+  h1{font-size:18px;}
+  .mode-btn{padding:8px 14px;font-size:14px;}
+  .btns button{padding:8px 12px;font-size:14px;}
+  .question{padding:10px;}
+  .question-grid{grid-template-columns:repeat(5,1fr);}
+}
 </style>
 </head>
 <body>
@@ -45,21 +57,17 @@ h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
         <button class="mode-btn active" data-mode="practice">练习模式</button>
         <button class="mode-btn" data-mode="exam">考试模式</button>
     </div>
-
     <div class="progress-bar" id="progressWrap">
         <div class="progress-inner" id="progressBar"></div>
     </div>
-
     <div id="questions"></div>
     <div id="result"></div>
-
     <div class="btns" id="examBtns" style="display:none;">
         <button id="submit">提交答案</button>
         <button id="reset">清空答案</button>
         <button id="redo">重做错题</button>
         <button id="change">更换题目</button>
     </div>
-
     <div class="btns" id="practiceBtns">
         <button id="prev">上一题</button>
         <button id="next">下一题</button>
@@ -67,14 +75,12 @@ h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
     </div>
 </div>
 <button id="backTop">↑</button>
-
 <div class="list-modal" id="listModal">
     <div class="list-box">
         <div class="list-title">全部题目列表（共200题）</div>
         <div class="question-grid" id="questionGrid"></div>
     </div>
 </div>
-
 <script>
 const fullBank = [
 {"q":"1. 绝对坐标编程指令是","opt":["A.G90","B.G91","C.G54","D.G00"],"ans":"A","tip":"G90绝对坐标，G91增量坐标"},
@@ -123,7 +129,7 @@ const fullBank = [
 {"q":"44. 程序中IJK含义","opt":["A.圆心增量坐标","B.转速","C.进给","D.补偿"],"ans":"A","tip":"IJK圆弧圆心相对于起点增量"},
 {"q":"45. 程序中P代码含义","opt":["A.延时时间","B.转速","C.进给","D.坐标"],"ans":"A","tip":"G04中P为毫秒延时"},
 {"q":"46. 程序中Q代码含义","opt":["A.每次切深","B.转速","C.进给","D.补偿"],"ans":"A","tip":"固定循环Q为每次切削深度"},
-{"q":"47. G52局部坐标系指令","opt":["A.模态","B.非模态","C.固定循环","D.补偿"],"ans":"B","tip":"G52非模态局部坐标设定"},
+{"q":"47. G52局部坐标系指令","opt":["A.非模态","B.模态","C.固定循环","D.补偿"],"ans":"B","tip":"G52非模态局部坐标设定"},
 {"q":"48. G68坐标旋转指令","opt":["A.模态","B.非模态","C.暂停","D.圆弧"],"ans":"A","tip":"G68模态坐标旋转"},
 {"q":"49. 取消坐标旋转指令","opt":["A.G69","B.G40","C.G80","D.G49"],"ans":"A","tip":"G69取消坐标旋转"},
 {"q":"50. G51.1开启镜像功能，取消用","opt":["A.G50.1","B.G40","C.G80","D.G49"],"ans":"A","tip":"G50.1取消镜像"},
@@ -278,7 +284,6 @@ const fullBank = [
 {"q":"199. 薄壁件加工关键是","opt":["A.减小切削力防止变形","B.提高转速","C.加大进给","D.加大切深"],"ans":"A","tip":"薄壁件极易变形，轻切快进"},
 {"q":"200. 加工中心安全操作第一原则是","opt":["A.开机前检查确认安全","B.直接运行程序","C.边玩手机边加工","D.随意修改参数"],"ans":"A","tip":"安全永远是数控加工第一位"}
 ];
-
 const pageSizeExam = 25;
 let mode = "practice";
 let currentExamList = [];
@@ -292,7 +297,6 @@ const practiceBtns = document.getElementById('practiceBtns');
 const listModal = document.getElementById('listModal');
 const questionGrid = document.getElementById('questionGrid');
 const backTopBtn = document.getElementById('backTop');
-
 document.querySelectorAll('.mode-btn').forEach(btn=>{
     btn.onclick = ()=>{
         document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
@@ -315,7 +319,6 @@ document.querySelectorAll('.mode-btn').forEach(btn=>{
         document.getElementById('result').innerText = "";
     }
 });
-
 function shuffle(arr){
     let a=[...arr];
     for(let i=a.length-1;i>0;i--){
@@ -342,7 +345,6 @@ function renderExam(){
     });
     document.getElementById('result').innerText="";
 }
-
 function renderPractice(){
     box.innerHTML="";
     let item = fullBank[currentPracticeIndex];
@@ -357,7 +359,6 @@ function renderPractice(){
     let percent = ((currentPracticeIndex+1)/fullBank.length*100).toFixed(1);
     progressBar.style.width = percent+"%";
 }
-
 function initQuestionList(){
     questionGrid.innerHTML="";
     for(let i=0;i<200;i++){
@@ -371,7 +372,6 @@ function initQuestionList(){
         questionGrid.appendChild(btn);
     }
 }
-
 document.getElementById('submit').onclick=()=>{
     let right=0;
     wrongList=[];
@@ -434,7 +434,6 @@ window.addEventListener('scroll',()=>{
 backTopBtn.onclick=()=>{
     window.scrollTo({top:0,behavior:'smooth'});
 };
-
 initQuestionList();
 currentPracticeIndex=0;
 renderPractice();
