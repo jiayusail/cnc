@@ -10,7 +10,7 @@
 <title>数控综合技能测试（500题完整版）</title>
 <style>
 *{box-sizing:border-box;font-family:"Microsoft YaHei",sans-serif;margin:0;padding:0;}
-body{background:#f5f7fa;padding:20px;}
+body{background:#f5f7fa;padding:20px;padding-bottom:140px;} /* 增加底部内边距防止内容被遮挡 */
 .container{max-width:950px;margin:0 auto;background:white;padding:30px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.1);position:relative;}
 h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
 .loading{text-align:center;padding:50px;font-size:18px;color:#666;}
@@ -31,10 +31,11 @@ h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
 }
 .progress-bar{height:8px;background:#e2e8f0;border-radius:4px;margin-bottom:15px;overflow:hidden;}
 .progress-inner{height:100%;background:#4299e1;width:0%;transition:0.3s;}
-.question{margin:16px 0;padding:14px;border-left:4px solid #4299e1;background:#f7fafc;border-radius:6px;min-height:180px;}
+.question{margin:16px 0;padding:14px;border-left:4px solid #4299e1;background:#f7fafc;border-radius:6px;min-height:120px;} /* 减小最小高度 */
 .q-title{font-weight:bold;margin-bottom:12px;color:#2d3748;line-height:1.5;}
-.option{margin:8px 0;cursor:pointer;padding:6px 8px;border-radius:4px;line-height:1.4;}
+.option{margin:8px 0;cursor:pointer;padding:6px 8px;border-radius:4px;line-height:1.4;display:flex;align-items:center;} /* 整行点击优化 */
 .option:hover{background:#e8f4ff;}
+.option input{margin-right:8px;cursor:pointer;}
 .analysis{font-size:14px;margin-top:12px;color:#4a5568;display:none;white-space:pre-line;line-height:1.5;}
 .correct{background:#c6f6d5 !important;color:#22543d;}
 .wrong{background:#fed7d7 !important;color:#742a2a;}
@@ -42,17 +43,20 @@ h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
 .show-answer .option{pointer-events:none;}
 #result{margin-top:20px;padding:12px;border-radius:6px;font-size:16px;text-align:center;font-weight:bold;min-height:44px;}
 
-/* 按钮通用容器 */
+/* 底部固定功能栏 */
 .btns{
     display:flex;
     justify-content:center;
     gap:24px;
-    padding:16px;
-    margin-top:48px; /* 空3行距离 */
+    padding:12px 16px;
     border-top:1px solid #eee;
     background:white;
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    z-index:100;
 }
-
 /* 练习模式图标按钮样式 */
 #practiceBtns button{
     width:48px;
@@ -73,7 +77,6 @@ h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
     color:#4299e1;
     background:#f0f7ff;
 }
-
 /* 考试模式文字按钮样式（与顶部模式按钮完全一致） */
 #examBtns button{
     width:auto;
@@ -90,7 +93,36 @@ h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
     background:#cbd5e0;
 }
 
-#backTop{position:fixed;right:20px;bottom:20px;width:46px;height:46px;border:2px solid #666;border-radius:50%;background:white;color:#666;font-size:20px;cursor:pointer;display:none;align-items:center;justify-content:center;font-weight:bold;}
+/* 学习统计栏 */
+.stats-bar{
+    display:flex;
+    justify-content:space-around;
+    align-items:center;
+    padding:8px 16px;
+    background:white;
+    border-top:1px solid #eee;
+    position:fixed;
+    bottom:72px; /* 位于功能按钮上方 */
+    left:0;
+    right:0;
+    z-index:99;
+}
+.stats-item{
+    text-align:center;
+}
+.stats-number{
+    font-size:18px;
+    font-weight:bold;
+    color:#4299e1; /* 主题蓝色 */
+    display:block;
+}
+.stats-text{
+    font-size:12px;
+    color:#4a5568; /* 深灰色 */
+    display:block;
+}
+
+#backTop{position:fixed;right:20px;bottom:160px;width:46px;height:46px;border:2px solid #666;border-radius:50%;background:white;color:#666;font-size:20px;cursor:pointer;display:none;align-items:center;justify-content:center;font-weight:bold;}
 #backTop:hover{
     border-color:#4299e1;
     color:#4299e1;
@@ -113,15 +145,19 @@ h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
   background:#ffcc00;color:#000;font-weight:bold;border-color:#ffcc00;
 }
 @media (max-width:767px){
-  body{padding:10px;}
+  body{padding:10px;padding-bottom:130px;}
   .container{padding:15px;}
   h1{font-size:18px;}
   .mode-btn{padding:8px 14px;font-size:14px;}
-  .btns{gap:12px;padding:12px;margin-top:36px;flex-wrap:wrap;}
+  .btns{gap:12px;padding:10px 12px;flex-wrap:wrap;}
   #practiceBtns button{width:42px;height:42px;font-size:20px;}
   #examBtns button{padding:8px 14px;font-size:14px;}
-  .question{padding:10px;min-height:160px;}
+  .question{padding:10px;min-height:100px;}
   .question-grid{grid-template-columns:repeat(5,1fr);}
+  .stats-bar{bottom:62px;padding:6px 12px;}
+  .stats-number{font-size:16px;}
+  .stats-text{font-size:11px;}
+  #backTop{bottom:150px;}
 }
 </style>
 </head>
@@ -150,23 +186,43 @@ h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
         </div>
         <div id="questions"></div>
         <div id="result"></div>
-
-        <!-- 考试模式文字按钮（与顶部风格完全一致） -->
-        <div class="btns" id="examBtns" style="display:none;">
-            <button id="submit" title="提交试卷">交卷</button>
-            <button id="reset" title="重置答案">重置</button>
-            <button id="redo" title="重做错题">错题</button>
-            <button id="change" title="换一组题">换题</button>
-        </div>
-
-        <!-- 练习模式图标按钮（保持不变） -->
-        <div class="btns" id="practiceBtns">
-            <button id="prev" title="上一题">←</button>
-            <button id="next" title="下一题">→</button>
-            <button id="allList" title="题目列表">☰</button>
-            <button id="clearPractice" title="清空答案">✕</button>
-        </div>
     </div>
+</div>
+
+<!-- 学习统计栏（仅背题/答题模式显示） -->
+<div class="stats-bar" id="statsBar" style="display:none;">
+    <div class="stats-item">
+        <span class="stats-number" id="unanswered">0</span>
+        <span class="stats-text">未做题</span>
+    </div>
+    <div class="stats-item">
+        <span class="stats-number" id="answered">0</span>
+        <span class="stats-text">已做题</span>
+    </div>
+    <div class="stats-item">
+        <span class="stats-number" id="wrong">0</span>
+        <span class="stats-text">错题数</span>
+    </div>
+    <div class="stats-item">
+        <span class="stats-number" id="accuracy">0%</span>
+        <span class="stats-text">正确率</span>
+    </div>
+</div>
+
+<!-- 考试模式文字按钮（与顶部风格完全一致） -->
+<div class="btns" id="examBtns" style="display:none;">
+    <button id="submit" title="提交试卷">交卷</button>
+    <button id="reset" title="重置答案">重置</button>
+    <button id="redo" title="重做错题">错题</button>
+    <button id="change" title="换一组题">换题</button>
+</div>
+
+<!-- 练习模式图标按钮（保持不变） -->
+<div class="btns" id="practiceBtns">
+    <button id="prev" title="上一题">←</button>
+    <button id="next" title="下一题">→</button>
+    <button id="allList" title="题目列表">☰</button>
+    <button id="clearPractice" title="清空答案">✕</button>
 </div>
 
 <button id="backTop" title="返回顶部">↑</button>
@@ -176,7 +232,6 @@ h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
         <div class="question-grid" id="questionGrid"></div>
     </div>
 </div>
-
 <script>
 // 全局错误捕获（GitHub Pages专属）
 window.onerror = function(message, source, lineno, colno, error) {
@@ -186,10 +241,8 @@ window.onerror = function(message, source, lineno, colno, error) {
     document.getElementById('loading').style.display = 'none';
     return true;
 };
-
 // 全局提示定时器
 var toastTimer = null;
-
 // 自动消失提示函数
 function showToast(text) {
     var result = document.getElementById('result');
@@ -202,7 +255,6 @@ function showToast(text) {
         result.innerText = "";
     }, 2000);
 }
-
 // 完整500题题库（已修复所有答案错误和截断问题）
 var fullBank = [
 {"q":"绝对坐标编程指令是","opt":["A.G91","B.G90","C.G54","D.G00"],"ans":"B","tip":"G90是绝对坐标编程，所有坐标值都以工件原点为基准；G91是增量坐标，以当前点为基准。","cate":"程序代码"},
@@ -706,7 +758,6 @@ var fullBank = [
 {"q":"不完全定位是指","opt":["A.限制全部自由度","B.根据加工要求限制部分自由度","C.限制少于3个自由度","D.限制多于6个自由度"],"ans":"B","tip":"不完全定位根据加工要求限制必要的自由度，是允许的。","cate":"工艺夹具"},
 {"q":"装夹是指","opt":["A.定位","B.定位+夹紧","C.夹紧","D.加工"],"ans":"B","tip":"装夹包括定位和夹紧两个过程。","cate":"工艺夹具"}
 ];
-
 var pageSizeExam = 25;
 var mode = "recite"; // 默认背题模式
 var currentExamList = [];
@@ -715,19 +766,42 @@ var currentPracticeIndex = 0;
 var practiceAnswers = {};
 var practiceJudge = {};
 var currentCategory = "all";
-var box, progressWrap, progressBar, examBtns, practiceBtns, listModal, questionGrid, backTopBtn, categorySelect;
-
+var box, progressWrap, progressBar, examBtns, practiceBtns, listModal, questionGrid, backTopBtn, categorySelect, statsBar;
 // 滑动切换相关变量
 var touchStartX = 0;
 var touchEndX = 0;
 var touchStartY = 0;
 var touchEndY = 0;
 
+// 更新学习统计数据
+function updateStats() {
+    var bank = getCateBank();
+    var total = bank.length;
+    var answered = Object.keys(practiceAnswers).length;
+    var unanswered = total - answered;
+    
+    // 计算错题数
+    var wrong = 0;
+    for(var key in practiceJudge) {
+        if(practiceJudge[key] === false) {
+            wrong++;
+        }
+    }
+    
+    // 计算正确率
+    var accuracy = answered > 0 ? ((answered - wrong) / answered * 100).toFixed(1) : 0;
+    
+    // 更新DOM
+    document.getElementById('unanswered').textContent = unanswered;
+    document.getElementById('answered').textContent = answered;
+    document.getElementById('wrong').textContent = wrong;
+    document.getElementById('accuracy').textContent = accuracy + '%';
+}
+
 // 兼容ES5的数组复制函数
 function copyArray(arr) {
     return arr.slice(0);
 }
-
 function getCateBank(){
     if(currentCategory === "all") return copyArray(fullBank);
     var result = [];
@@ -738,7 +812,6 @@ function getCateBank(){
     }
     return result;
 }
-
 // 兼容的类名操作函数
 function addClass(elem, className) {
     if (!elem.classList) {
@@ -747,7 +820,6 @@ function addClass(elem, className) {
         elem.classList.add(className);
     }
 }
-
 function removeClass(elem, className) {
     if (!elem.classList) {
         elem.className = elem.className.replace(new RegExp('(^|\\b)' + className.split(' ').join('|') + '(\\b|$)', 'gi'), ' ');
@@ -755,7 +827,6 @@ function removeClass(elem, className) {
         elem.classList.remove(className);
     }
 }
-
 function hasClass(elem, className) {
     if (!elem.classList) {
         return new RegExp('(^| )' + className + '( |$)', 'gi').test(elem.className);
@@ -763,26 +834,22 @@ function hasClass(elem, className) {
         return elem.classList.contains(className);
     }
 }
-
 // 滑动事件处理函数
 function handleTouchStart(e) {
     touchStartX = e.touches[0].clientX;
     touchStartY = e.touches[0].clientY;
 }
-
 function handleTouchMove(e) {
     // 防止滑动时误触单选按钮
     if(Math.abs(e.touches[0].clientX - touchStartX) > 10) {
         e.preventDefault();
     }
 }
-
 function handleTouchEnd(e) {
     touchEndX = e.changedTouches[0].clientX;
     touchEndY = e.changedTouches[0].clientY;
     handleSwipe();
 }
-
 function handleSwipe() {
     var bank = getCateBank();
     var diffX = touchEndX - touchStartX;
@@ -805,7 +872,6 @@ function handleSwipe() {
         }
     }
 }
-
 // 初始化函数
 function initApp() {
     try {
@@ -819,6 +885,7 @@ function initApp() {
         questionGrid = document.getElementById('questionGrid');
         backTopBtn = document.getElementById('backTop');
         categorySelect = document.getElementById('categorySelect');
+        statsBar = document.getElementById('statsBar');
         
         // 绑定滑动事件（仅在练习/背题模式有效）
         document.addEventListener('touchstart', handleTouchStart, {passive: true});
@@ -837,6 +904,7 @@ function initApp() {
             }else{
                 initQuestionList();
                 renderPractice();
+                updateStats(); // 更新统计
             }
         });
         
@@ -861,15 +929,18 @@ function initApp() {
                 if(mode === "exam"){
                     examBtns.style.display = "flex";
                     practiceBtns.style.display = "none";
+                    statsBar.style.display = "none"; // 考试模式隐藏统计
                     progressWrap.style.display = "none";
                     getNewExamBatch();
                     renderExam();
                 }else{
                     examBtns.style.display = "none";
                     practiceBtns.style.display = "flex";
+                    statsBar.style.display = "flex"; // 背题/答题模式显示统计
                     progressWrap.style.display = "block";
                     initQuestionList();
                     renderPractice();
+                    updateStats(); // 更新统计
                 }
             });
         }
@@ -971,10 +1042,12 @@ function initApp() {
         // 初始化
         initQuestionList();
         renderPractice();
+        updateStats(); // 初始化统计
         
         // 隐藏加载，显示应用
         document.getElementById('loading').style.display = 'none';
         document.getElementById('app').style.display = 'block';
+        statsBar.style.display = 'flex'; // 默认背题模式显示统计
         
     } catch (e) {
         var errorDiv = document.getElementById('error');
@@ -983,7 +1056,6 @@ function initApp() {
         document.getElementById('loading').style.display = 'none';
     }
 }
-
 function shuffle(arr){
     var a = copyArray(arr);
     for(var i=a.length-1; i>0; i--){
@@ -994,12 +1066,10 @@ function shuffle(arr){
     }
     return a;
 }
-
 function getNewExamBatch(){
     var bank = getCateBank();
     currentExamList = shuffle(bank).slice(0, pageSizeExam);
 }
-
 function renderExam(){
     box.innerHTML="";
     wrongList=[];
@@ -1015,11 +1085,25 @@ function renderExam(){
         div.innerHTML+='<div class="analysis">解析：'+item.tip+'</div>';
         box.appendChild(div);
     }
+    
+    // 考试模式也添加整行点击功能
+    var options = document.querySelectorAll('.option');
+    for(var k=0; k<options.length; k++){
+        options[k].addEventListener('click', function(){
+            var radio = this.querySelector('input[type=radio]');
+            if(radio) {
+                radio.checked = true;
+                // 触发change事件（如果有需要）
+                var event = new Event('change');
+                radio.dispatchEvent(event);
+            }
+        });
+    }
+    
     // 清除之前的提示
     if(toastTimer) clearTimeout(toastTimer);
     document.getElementById('result').innerText = "";
 }
-
 function renderPractice(){
     var bank = getCateBank();
     if(currentPracticeIndex >= bank.length) currentPracticeIndex = bank.length - 1;
@@ -1057,12 +1141,24 @@ function renderPractice(){
         div.querySelector('.analysis').style.display = 'block';
     }
     
-    // 答题模式绑定事件
+    // 答题模式绑定事件 + 整行点击
     if(mode === "practice"){
         var inputs = div.querySelectorAll('input[type=radio]');
         for(var j=0; j<inputs.length; j++){
             inputs[j].addEventListener('change', function(){
                 checkPracticeAnswer();
+            });
+        }
+        
+        // 整行点击选中
+        var options = div.querySelectorAll('.option');
+        for(var k=0; k<options.length; k++){
+            options[k].addEventListener('click', function(){
+                var radio = this.querySelector('input[type=radio]');
+                if(radio && !radio.checked) {
+                    radio.checked = true;
+                    checkPracticeAnswer();
+                }
             });
         }
     }
@@ -1075,7 +1171,6 @@ function renderPractice(){
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
 }
-
 function checkPracticeAnswer(){
     var bank = getCateBank();
     var item = bank[currentPracticeIndex];
@@ -1093,8 +1188,8 @@ function checkPracticeAnswer(){
     addClass(qdom, isRight ? 'correct' : 'wrong');
     qdom.querySelector('.analysis').style.display = 'block';
     updateQuestionGridMark();
+    updateStats(); // 答题后更新统计
 }
-
 function updateQuestionGridMark(){
     var bank = getCateBank();
     var btns = questionGrid.querySelectorAll('button');
@@ -1110,15 +1205,14 @@ function updateQuestionGridMark(){
         }
     }
 }
-
 function clearPracticeAll(){
     practiceAnswers = {};
     practiceJudge = {};
     renderPractice();
     updateQuestionGridMark();
+    updateStats(); // 清空后更新统计
     showToast("已清空所有练习答案");
 }
-
 function initQuestionList(){
     questionGrid.innerHTML="";
     var bank = getCateBank();
@@ -1135,7 +1229,6 @@ function initQuestionList(){
         questionGrid.appendChild(btn);
     }
 }
-
 // 使用DOMContentLoaded代替window.onload，加载更快更可靠
 if (document.readyState === "complete" || document.readyState === "interactive") {
     setTimeout(initApp, 1);
