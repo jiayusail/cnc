@@ -4,13 +4,15 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<meta name="renderer" content="webkit">
+<meta name="force-rendering" content="webkit">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>数控综合技能测试（500题完整版）</title>
 <style>
 *{box-sizing:border-box;font-family:"Microsoft YaHei",sans-serif;margin:0;padding:0;}
-body{background:#f5f7fa;padding:20px;padding-bottom:140px;} /* 增加底部内边距防止内容被遮挡 */
+body{background:#f5f7fa;padding:20px;padding-bottom:140px;}
 .container{max-width:950px;margin:0 auto;background:white;padding:30px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.1);position:relative;}
 h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
 .loading{text-align:center;padding:50px;font-size:18px;color:#666;}
@@ -31,9 +33,9 @@ h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
 }
 .progress-bar{height:8px;background:#e2e8f0;border-radius:4px;margin-bottom:15px;overflow:hidden;}
 .progress-inner{height:100%;background:#4299e1;width:0%;transition:0.3s;}
-.question{margin:16px 0;padding:14px;border-left:4px solid #4299e1;background:#f7fafc;border-radius:6px;min-height:120px;} /* 减小最小高度 */
+.question{margin:16px 0;padding:14px;border-left:4px solid #4299e1;background:#f7fafc;border-radius:6px;min-height:120px;}
 .q-title{font-weight:bold;margin-bottom:12px;color:#2d3748;line-height:1.5;}
-.option{margin:8px 0;cursor:pointer;padding:6px 8px;border-radius:4px;line-height:1.4;display:flex;align-items:center;} /* 整行点击优化 */
+.option{margin:8px 0;cursor:pointer;padding:6px 8px;border-radius:4px;line-height:1.4;display:flex;align-items:center;}
 .option:hover{background:#e8f4ff;}
 .option input{margin-right:8px;cursor:pointer;}
 .analysis{font-size:14px;margin-top:12px;color:#4a5568;display:none;white-space:pre-line;line-height:1.5;}
@@ -41,8 +43,45 @@ h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
 .wrong{background:#fed7d7 !important;color:#742a2a;}
 .show-answer .analysis{display:block !important;}
 .show-answer .option{pointer-events:none;}
-#result{margin-top:20px;padding:12px;border-radius:6px;font-size:16px;text-align:center;font-weight:bold;min-height:44px;}
-
+#result{display:none;}
+/* 中央悬浮弹窗样式 */
+.toast-modal{
+    position:fixed;
+    top:50%;
+    left:50%;
+    transform:translate(-50%, -50%);
+    background:white;
+    padding:16px 24px;
+    border-radius:8px;
+    box-shadow:0 4px 20px rgba(0,0,0,0.15);
+    z-index:1000;
+    text-align:center;
+    font-size:16px;
+    color:#2d3748;
+    max-width:80%;
+    animation:fadeIn 0.2s ease-out;
+}
+.toast-modal.long-toast{
+    padding:20px 24px;
+    min-width:280px;
+    max-width:400px;
+}
+.toast-modal .toast-close{
+    position:absolute;
+    top:8px;
+    right:12px;
+    font-size:18px;
+    color:#999;
+    cursor:pointer;
+    line-height:1;
+}
+.toast-modal .toast-close:hover{
+    color:#666;
+}
+@keyframes fadeIn{
+    from{opacity:0;transform:translate(-50%, -50%) scale(0.95);}
+    to{opacity:1;transform:translate(-50%, -50%) scale(1);}
+}
 /* 底部固定功能栏 */
 .btns{
     display:flex;
@@ -92,7 +131,6 @@ h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
 #examBtns button:hover{
     background:#cbd5e0;
 }
-
 /* 学习统计栏 */
 .stats-bar{
     display:flex;
@@ -102,7 +140,7 @@ h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
     background:white;
     border-top:1px solid #eee;
     position:fixed;
-    bottom:72px; /* 位于功能按钮上方 */
+    bottom:72px;
     left:0;
     right:0;
     z-index:99;
@@ -113,19 +151,52 @@ h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
 .stats-number{
     font-size:18px;
     font-weight:bold;
-    color:#4299e1; /* 主题蓝色 */
+    color:#4299e1;
     display:block;
 }
 .stats-text{
     font-size:12px;
-    color:#4a5568; /* 深灰色 */
+    color:#4a5568;
     display:block;
 }
-
 #backTop{position:fixed;right:20px;bottom:160px;width:46px;height:46px;border:2px solid #666;border-radius:50%;background:white;color:#666;font-size:20px;cursor:pointer;display:none;align-items:center;justify-content:center;font-weight:bold;}
 #backTop:hover{
     border-color:#4299e1;
     color:#4299e1;
+}
+/* 简约沙漏风格倒计时按钮 - 与返回顶部完全一致 */
+#countdownBtn{
+    position:fixed;
+    right:20px;
+    bottom:220px;
+    width:46px;
+    height:46px;
+    border:2px solid #666;
+    border-radius:50%;
+    background:white;
+    color:#666;
+    font-size:23px;
+    cursor:pointer;
+    display:none;
+    align-items:center;
+    justify-content:center;
+    font-weight:normal;
+    line-height:1;
+    overflow:hidden; /* 确保内容不超出圆圈 */
+}
+#countdownBtn:hover{
+    border-color:#4299e1;
+    color:#4299e1;
+}
+#countdownBtn.active{
+    border-color:#e53e3e;
+    color:#e53e3e;
+}
+/* 倒计时时间显示样式 - 确保在圆圈内 */
+#countdownBtn.time-display{
+    font-size:11px;
+    font-weight:bold;
+    letter-spacing:-0.5px;
 }
 .list-modal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:999;}
 .list-box{background:white;padding:20px;border-radius:8px;max-height:80vh;overflow-y:auto;width:80%;max-width:600px;}
@@ -158,6 +229,15 @@ h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
   .stats-number{font-size:16px;}
   .stats-text{font-size:11px;}
   #backTop{bottom:150px;}
+  #countdownBtn{bottom:210px;}
+  .toast-modal.long-toast{
+      min-width:240px;
+      max-width:90%;
+  }
+  /* 移动端倒计时时间显示调整 */
+  #countdownBtn.time-display{
+      font-size:10px;
+  }
 }
 </style>
 </head>
@@ -188,7 +268,6 @@ h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
         <div id="result"></div>
     </div>
 </div>
-
 <!-- 学习统计栏（仅背题/答题模式显示） -->
 <div class="stats-bar" id="statsBar" style="display:none;">
     <div class="stats-item">
@@ -208,7 +287,6 @@ h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
         <span class="stats-text">正确率</span>
     </div>
 </div>
-
 <!-- 考试模式文字按钮（与顶部风格完全一致） -->
 <div class="btns" id="examBtns" style="display:none;">
     <button id="submit" title="提交试卷">交卷</button>
@@ -216,7 +294,6 @@ h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
     <button id="redo" title="重做错题">错题</button>
     <button id="change" title="换一组题">换题</button>
 </div>
-
 <!-- 练习模式图标按钮（保持不变） -->
 <div class="btns" id="practiceBtns">
     <button id="prev" title="上一题">←</button>
@@ -224,8 +301,9 @@ h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
     <button id="allList" title="题目列表">☰</button>
     <button id="clearPractice" title="清空答案">✕</button>
 </div>
-
 <button id="backTop" title="返回顶部">↑</button>
+<!-- 简约沙漏风格倒计时图标 -->
+<button id="countdownBtn" title="开始考试倒计时">▶</button>
 <div class="list-modal" id="listModal">
     <div class="list-box">
         <div class="list-title">全部题目列表（共500题）</div>
@@ -233,8 +311,13 @@ h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
     </div>
 </div>
 <script>
-// 全局错误捕获（GitHub Pages专属）
+// 全局错误捕获（兼容所有浏览器，过滤跨域Script error）
 window.onerror = function(message, source, lineno, colno, error) {
+    // 过滤QQ/UC/夸克浏览器的跨域脚本错误（行号为0的Script error）
+    if (message.indexOf('Script error.') !== -1 && lineno === 0) {
+        return true; // 阻止默认报错展示
+    }
+    // 其他真实错误正常展示
     var errorDiv = document.getElementById('error');
     errorDiv.style.display = 'block';
     errorDiv.innerHTML = '页面加载出错，请刷新重试：\n' + message + '\n行号：' + lineno;
@@ -243,19 +326,80 @@ window.onerror = function(message, source, lineno, colno, error) {
 };
 // 全局提示定时器
 var toastTimer = null;
-// 自动消失提示函数
+var longToastActive = false;
+var currentToast = null;
+// 自动消失提示函数（2秒）- 中央悬浮显示
 function showToast(text) {
-    var result = document.getElementById('result');
-    // 清除之前的定时器
+    if(longToastActive) return; // 长提示显示时不显示短提示
+    
+    // 清除之前的提示
     if(toastTimer) clearTimeout(toastTimer);
-    // 显示提示
-    result.innerText = text;
+    if(currentToast) {
+        document.body.removeChild(currentToast);
+        currentToast = null;
+    }
+    
+    // 创建新的提示
+    var toast = document.createElement('div');
+    toast.className = 'toast-modal';
+    toast.innerText = text;
+    document.body.appendChild(toast);
+    currentToast = toast;
+    
     // 2秒后自动消失
     toastTimer = setTimeout(function(){
-        result.innerText = "";
+        if(currentToast === toast) {
+            document.body.removeChild(toast);
+            currentToast = null;
+        }
     }, 2000);
 }
-// 完整500题题库（已修复所有答案错误和截断问题）
+// 长显示提示函数（点击关闭按钮或空白处消失）- 中央悬浮显示
+function showLongToast(text) {
+    // 清除之前的提示
+    if(toastTimer) clearTimeout(toastTimer);
+    if(currentToast) {
+        document.body.removeChild(currentToast);
+        currentToast = null;
+    }
+    
+    // 创建新的长提示
+    var toast = document.createElement('div');
+    toast.className = 'toast-modal long-toast';
+    toast.innerHTML = '<span class="toast-close">×</span>' + text;
+    document.body.appendChild(toast);
+    currentToast = toast;
+    longToastActive = true;
+    
+    // 关闭函数
+    var closeToast = function() {
+        if(currentToast === toast) {
+            document.body.removeChild(toast);
+            currentToast = null;
+            longToastActive = false;
+        }
+        document.removeEventListener('click', closeHandler);
+    };
+    
+    // 点击关闭按钮
+    toast.querySelector('.toast-close').addEventListener('click', function(e) {
+        e.stopPropagation();
+        closeToast();
+    });
+    
+    // 点击空白处关闭
+    var closeHandler = function(e) {
+        if(e.target !== toast && !toast.contains(e.target)) {
+            closeToast();
+        }
+    };
+    
+    // 延迟绑定事件，防止点击交卷按钮立即触发
+    setTimeout(function(){
+        document.addEventListener('click', closeHandler);
+    }, 100);
+}
+// 完整500题题库（无中断、无截断、答案准确）
 var fullBank = [
 {"q":"绝对坐标编程指令是","opt":["A.G91","B.G90","C.G54","D.G00"],"ans":"B","tip":"G90是绝对坐标编程，所有坐标值都以工件原点为基准；G91是增量坐标，以当前点为基准。","cate":"程序代码"},
 {"q":"相对增量坐标编程指令是","opt":["A.G90","B.G55","C.G91","D.G01"],"ans":"C","tip":"G91为增量/相对坐标模式，每一段坐标都是以上一个点为基准的增量值。","cate":"程序代码"},
@@ -548,7 +692,7 @@ var fullBank = [
 {"q":"精加工时切削液应","opt":["A.不用","B.高压喷射","C.少量","D.间断"],"ans":"B","tip":"精加工高压喷射可冲走切屑，提高表面质量。","cate":"加工参数"},
 {"q":"刀具磨损到什么程度应更换","opt":["A.完全磨损","B.达到磨钝标准","C.崩刃后","D.任意时候"],"ans":"B","tip":"达到磨钝标准就应更换，避免过度磨损损坏工件。","cate":"加工参数"},
 {"q":"加工中心主轴转速S的单位是","opt":["A.m/min","B.r/min","C.mm/min","D.mm/r"],"ans":"B","tip":"S主轴转速单位是转/分钟（r/min）。","cate":"加工参数"},
-{"q":"G94模式下F的单位是","opt":["A.mm/r","B.mm/min","C.m/min","D.r/min"],"ans":"B","tip":"G94每分钟进给，F单位mm/min，加工中心默认。","cate":"加工参数"},
+{"q":"G94模式下F的单位是","opt":["A.mm/r","B.mm/min","C.m/min","D.r/min"],"ans":"B","tip":"G94每分钟进给，F单位mm/min，加工中心默认模式。","cate":"加工参数"},
 {"q":"G95模式下F的单位是","opt":["A.mm/min","B.mm/r","C.m/min","D.r/min"],"ans":"B","tip":"G95每转进给，F单位mm/转，车削攻丝常用。","cate":"加工参数"},
 {"q":"加工相同材料时，刀具直径越大转速应","opt":["A.越高","B.越低","C.不变","D.任意"],"ans":"B","tip":"线速度相同，直径越大转速越低。","cate":"加工参数"},
 {"q":"加工相同材料时，刀具直径越小转速应","opt":["A.越低","B.越高","C.不变","D.任意"],"ans":"B","tip":"线速度相同，直径越小转速越高。","cate":"加工参数"},
@@ -626,7 +770,7 @@ var fullBank = [
 {"q":"图纸中MIN代表","opt":["A.最大值","B.最小值","C.公差","D.参考"],"ans":"B","tip":"MIN表示该尺寸的最小允许值。","cate":"机械图纸"},
 {"q":"图纸中REF代表","opt":["A.公差","B.参考尺寸","C.深度","D.角度"],"ans":"B","tip":"REF表示参考尺寸，仅作参考，不做检验依据。","cate":"机械图纸"},
 {"q":"普通公制螺纹的牙型角是","opt":["A.30°","B.60°","C.55°","D.45°"],"ans":"B","tip":"普通公制三角螺纹牙型角为60°。","cate":"机械图纸"},
-{"q":"英制管螺纹的牙型角是","opt":["A.60°","B.55°","C.30°","D.45°"],"ans":"B","tip":"英制管螺纹牙型角为55°。","cate":"机械图纸"},
+{"q":"英制管螺纹的牙型角是","opt":["A.60°","B.55°","C.30°","C.45°"],"ans":"B","tip":"英制管螺纹牙型角为55°。","cate":"机械图纸"},
 {"q":"梯形螺纹的牙型角是","opt":["A.60°","B.30°","C.55°","D.45°"],"ans":"B","tip":"梯形螺纹牙型角为30°，用于传动。","cate":"机械图纸"},
 {"q":"图纸中M10×1.5表示","opt":["A.公称直径10mm螺距1.5mm","B.直径10mm深度1.5mm","C.直径10mm公差1.5mm","D.长度10mm螺距1.5mm"],"ans":"A","tip":"M10×1.5表示细牙螺纹，公称直径10mm，螺距1.5mm。","cate":"机械图纸"},
 {"q":"图纸中G1/2表示","opt":["A.公制螺纹","B.英制非密封管螺纹","C.梯形螺纹","D.锯齿螺纹"],"ans":"B","tip":"G表示英制非密封管螺纹，1/2为尺寸代号。","cate":"机械图纸"},
@@ -766,13 +910,16 @@ var currentPracticeIndex = 0;
 var practiceAnswers = {};
 var practiceJudge = {};
 var currentCategory = "all";
-var box, progressWrap, progressBar, examBtns, practiceBtns, listModal, questionGrid, backTopBtn, categorySelect, statsBar;
+var box, progressWrap, progressBar, examBtns, practiceBtns, listModal, questionGrid, backTopBtn, categorySelect, statsBar, countdownBtn;
+// 倒计时相关变量
+var countdownTimer = null;
+var countdownTime = 15 * 60; // 15分钟，单位秒
+var countdownRunning = false;
 // 滑动切换相关变量
 var touchStartX = 0;
 var touchEndX = 0;
 var touchStartY = 0;
 var touchEndY = 0;
-
 // 更新学习统计数据
 function updateStats() {
     var bank = getCateBank();
@@ -797,7 +944,64 @@ function updateStats() {
     document.getElementById('wrong').textContent = wrong;
     document.getElementById('accuracy').textContent = accuracy + '%';
 }
-
+// 格式化倒计时时间
+function formatTime(seconds) {
+    var min = Math.floor(seconds / 60);
+    var sec = seconds % 60;
+    return (min < 10 ? '0' : '') + min + ':' + (sec < 10 ? '0' : '') + sec;
+}
+// 开始/暂停倒计时
+function toggleCountdown() {
+    if(countdownRunning) {
+        // 暂停倒计时
+        clearInterval(countdownTimer);
+        countdownRunning = false;
+        countdownBtn.textContent = '︎▶︎';
+        removeClass(countdownBtn, 'time-display');
+        removeClass(countdownBtn, 'active');
+        showToast("考试倒计时已暂停");
+    } else {
+        // 开始倒计时
+        if(countdownTime <= 0) {
+            countdownTime = 15 * 60; // 重置为15分钟
+        }
+        
+        countdownBtn.textContent = formatTime(countdownTime);
+        addClass(countdownBtn, 'time-display');
+        addClass(countdownBtn, 'active');
+        countdownRunning = true;
+        
+        countdownTimer = setInterval(function() {
+            countdownTime--;
+            countdownBtn.textContent = formatTime(countdownTime);
+            
+            if(countdownTime <= 0) {
+                clearInterval(countdownTimer);
+                countdownRunning = false;
+                countdownBtn.textContent = '▶︎';
+                removeClass(countdownBtn, 'time-display');
+                removeClass(countdownBtn, 'active');
+                
+                // 时间到自动交卷
+                showToast("考试时间到！自动交卷中...");
+                setTimeout(function() {
+                    document.getElementById('submit').click();
+                }, 1000);
+            }
+        }, 1000);
+        
+        showToast("考试倒计时已开始");
+    }
+}
+// 重置倒计时
+function resetCountdown() {
+    clearInterval(countdownTimer);
+    countdownRunning = false;
+    countdownTime = 15 * 60;
+    countdownBtn.textContent = '▶︎';
+    removeClass(countdownBtn, 'time-display');
+    removeClass(countdownBtn, 'active');
+}
 // 兼容ES5的数组复制函数
 function copyArray(arr) {
     return arr.slice(0);
@@ -851,6 +1055,9 @@ function handleTouchEnd(e) {
     handleSwipe();
 }
 function handleSwipe() {
+    // 仅背题和答题模式允许滑动切换，考试模式完全禁用
+    if(mode !== "recite" && mode !== "practice") return;
+    
     var bank = getCateBank();
     var diffX = touchEndX - touchStartX;
     var diffY = touchEndY - touchStartY;
@@ -886,11 +1093,15 @@ function initApp() {
         backTopBtn = document.getElementById('backTop');
         categorySelect = document.getElementById('categorySelect');
         statsBar = document.getElementById('statsBar');
+        countdownBtn = document.getElementById('countdownBtn');
         
-        // 绑定滑动事件（仅在练习/背题模式有效）
-        document.addEventListener('touchstart', handleTouchStart, {passive: true});
-        document.addEventListener('touchmove', handleTouchMove, {passive: false});
-        document.addEventListener('touchend', handleTouchEnd, {passive: true});
+        // 绑定倒计时按钮事件
+        countdownBtn.addEventListener('click', toggleCountdown);
+        
+        // 绑定滑动事件
+        document.addEventListener('touchstart', handleTouchStart, false);
+        document.addEventListener('touchmove', handleTouchMove, false);
+        document.addEventListener('touchend', handleTouchEnd, false);
         
         // 绑定分类选择事件
         categorySelect.addEventListener('change', function(){
@@ -899,6 +1110,7 @@ function initApp() {
             practiceJudge = {};
             currentPracticeIndex = 0;
             if(mode === "exam"){
+                resetCountdown();
                 getNewExamBatch();
                 renderExam();
             }else{
@@ -924,20 +1136,28 @@ function initApp() {
                 
                 // 清除之前的提示
                 if(toastTimer) clearTimeout(toastTimer);
-                document.getElementById('result').innerText = "";
+                if(currentToast) {
+                    document.body.removeChild(currentToast);
+                    currentToast = null;
+                }
+                longToastActive = false;
                 
                 if(mode === "exam"){
                     examBtns.style.display = "flex";
                     practiceBtns.style.display = "none";
                     statsBar.style.display = "none"; // 考试模式隐藏统计
+                    countdownBtn.style.display = "flex"; // 显示倒计时按钮
                     progressWrap.style.display = "none";
+                    resetCountdown(); // 重置倒计时
                     getNewExamBatch();
                     renderExam();
                 }else{
                     examBtns.style.display = "none";
                     practiceBtns.style.display = "flex";
                     statsBar.style.display = "flex"; // 背题/答题模式显示统计
+                    countdownBtn.style.display = "none"; // 隐藏倒计时按钮
                     progressWrap.style.display = "block";
+                    resetCountdown(); // 重置倒计时
                     initQuestionList();
                     renderPractice();
                     updateStats(); // 更新统计
@@ -945,8 +1165,9 @@ function initApp() {
             });
         }
         
-        // 绑定考试模式按钮事件
+        // 绑定考试模式按钮事件（添加悬浮提示）
         document.getElementById('submit').addEventListener('click', function(){
+            showToast("正在提交试卷...");
             var right=0;
             wrongList=[];
             var questions = document.querySelectorAll('.question');
@@ -967,7 +1188,31 @@ function initApp() {
                 }
             }
             var score = (right/currentExamList.length*100).toFixed(1);
-            document.getElementById('result').innerText='得分：'+score+' 分（答对'+right+'/'+currentExamList.length+'题，错题'+wrongList.length+'题）';
+            var wrongCount = wrongList.length;
+            var correctCount = right;
+            
+            // 生成鼓励语
+            var encouragement = "";
+            if(score >= 90) {
+                encouragement = "🎉 太棒了！你已经掌握了大部分知识，继续保持！";
+            } else if(score >= 70) {
+                encouragement = "👍 不错！还有提升空间，多看看错题会更好！";
+            } else if(score >= 60) {
+                encouragement = "💪 及格了！但还需要加强练习，重点复习薄弱环节！";
+            } else {
+                encouragement = "📚 逢考必过！继续加油！";
+            }
+            
+            // 长显示结果
+            var resultHtml = '<div style="font-size:18px;margin-bottom:8px;">考试成绩：<span style="color:#4299e1;font-size:24px;">' + score + ' 分</span></div>';
+            resultHtml += '<div style="margin-bottom:12px;">答对：' + correctCount + ' 题 | 答错：' + wrongCount + ' 题</div>';
+            resultHtml += '<div style="color:#666;font-size:14px;">' + encouragement + '</div>';
+            resultHtml += '<div style="font-size:12px;color:#999;margin-top:8px;">任意点击关闭</div>';
+            
+            showLongToast(resultHtml);
+            
+            // 停止倒计时
+            resetCountdown();
         });
         
         document.getElementById('reset').addEventListener('click', function(){
@@ -991,12 +1236,14 @@ function initApp() {
                 return;
             }
             currentExamList = copyArray(wrongList);
+            resetCountdown();
             renderExam();
             showToast("进入错题重做模式");
         });
         
         document.getElementById('change').addEventListener('click', function(){
             getNewExamBatch();
+            resetCountdown();
             renderExam();
             showToast("已更换新的一组题目");
         });
@@ -1048,11 +1295,12 @@ function initApp() {
         document.getElementById('loading').style.display = 'none';
         document.getElementById('app').style.display = 'block';
         statsBar.style.display = 'flex'; // 默认背题模式显示统计
+        countdownBtn.style.display = 'none'; // 默认隐藏倒计时按钮
         
     } catch (e) {
         var errorDiv = document.getElementById('error');
         errorDiv.style.display = 'block';
-        errorDiv.innerHTML = '初始化出错：\n' + e.message + '\n行号：' + e.lineNumber;
+        errorDiv.innerHTML = '初始化出错，请刷新重试：\n' + e.message + '\n行号：' + e.lineNumber;
         document.getElementById('loading').style.display = 'none';
     }
 }
@@ -1102,7 +1350,11 @@ function renderExam(){
     
     // 清除之前的提示
     if(toastTimer) clearTimeout(toastTimer);
-    document.getElementById('result').innerText = "";
+    if(currentToast) {
+        document.body.removeChild(currentToast);
+        currentToast = null;
+    }
+    longToastActive = false;
 }
 function renderPractice(){
     var bank = getCateBank();
