@@ -12,7 +12,7 @@
 <title>数控综合技能测试（500题完整版）</title>
 <style>
 *{box-sizing:border-box;font-family:"Microsoft YaHei",sans-serif;margin:0;padding:0;}
-body{background:#f5f7fa;padding:20px;padding-bottom:140px;}
+body{background:#f5f7fa;padding:20px;padding-bottom:120px;}
 .container{max-width:950px;margin:0 auto;background:white;padding:30px;border-radius:12px;box-shadow:0 2px 12px rgba(0,0,0,0.1);position:relative;}
 h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
 .loading{text-align:center;padding:50px;font-size:18px;color:#666;}
@@ -23,7 +23,7 @@ h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
 .mode-btn:hover{background:#cbd5e0;}
 .mode-btn.active:hover{background:#3182ce;}
 .category-select{
-    padding:8px 12px;
+    padding:6px 12px;
     border:1px solid #e2e8f0;
     border-radius:6px;
     font-size:15px;
@@ -87,7 +87,8 @@ h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
     display:flex;
     justify-content:center;
     gap:24px;
-    padding:12px 16px;
+    padding:6px 16px;
+    padding-bottom: calc(6px + env(safe-area-inset-bottom));
     border-top:1px solid #eee;
     background:white;
     position:fixed;
@@ -116,20 +117,33 @@ h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
     color:#4299e1;
     background:#f0f7ff;
 }
-/* 考试模式文字按钮样式（与顶部模式按钮完全一致） */
+#practiceBtns button.active{
+    color:#e53e3e;
+    background:#fff5f5;
+}
+/* 考试模式图标按钮样式（与答题模式完全一致） */
 #examBtns button{
-    width:auto;
-    padding:10px 20px;
+    width:48px;
+    height:48px;
     border:none;
-    border-radius:6px;
-    font-size:15px;
+    border-radius:12px;
+    font-size:24px;
     cursor:pointer;
-    color:#2d3748;
-    background:#e2e8f0;
+    color:#666;
+    background:transparent;
+    display:flex;
+    align-items:center;
+    justify-content:center;
     transition:all 0.2s;
+    font-weight:normal;
 }
 #examBtns button:hover{
-    background:#cbd5e0;
+    color:#4299e1;
+    background:#f0f7ff;
+}
+#examBtns button.active{
+    color:#e53e3e;
+    background:#fff5f5;
 }
 /* 学习统计栏 */
 .stats-bar{
@@ -140,7 +154,7 @@ h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
     background:white;
     border-top:1px solid #eee;
     position:fixed;
-    bottom:72px;
+    bottom:60px;
     left:0;
     right:0;
     z-index:99;
@@ -159,23 +173,23 @@ h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
     color:#4a5568;
     display:block;
 }
-#backTop{position:fixed;right:20px;bottom:160px;width:46px;height:46px;border:2px solid #666;border-radius:50%;background:white;color:#666;font-size:20px;cursor:pointer;display:none;align-items:center;justify-content:center;font-weight:bold;}
+#backTop{position:fixed;right:20px;bottom:140px;width:46px;height:46px;border:2px solid #666;border-radius:50%;background:white;color:#666;font-size:20px;cursor:pointer;display:none;align-items:center;justify-content:center;font-weight:bold;}
 #backTop:hover{
     border-color:#4299e1;
     color:#4299e1;
 }
-/* 简约沙漏风格倒计时按钮 - 与返回顶部完全一致 */
+/* 简约三角形风格倒计时按钮 - 与返回顶部完全一致 */
 #countdownBtn{
     position:fixed;
     right:20px;
-    bottom:220px;
+    bottom:200px;
     width:46px;
     height:46px;
     border:2px solid #666;
     border-radius:50%;
     background:white;
     color:#666;
-    font-size:23px;
+    font-size:20px;
     cursor:pointer;
     display:none;
     align-items:center;
@@ -194,7 +208,7 @@ h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
 }
 /* 倒计时时间显示样式 - 确保在圆圈内 */
 #countdownBtn.time-display{
-    font-size:11px;
+    font-size:14px;
     font-weight:bold;
     letter-spacing:-0.5px;
 }
@@ -209,35 +223,202 @@ h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
 .question-grid button.answered{
   background:#4299e1;color:#fff;border-color:#4299e1;
 }
-.question-grid button.answered::after{
-  content:" ✓";font-weight:bold;
-}
 .question-grid button.current{
   background:#ffcc00;color:#000;font-weight:bold;border-color:#ffcc00;
 }
+.question-grid button.wrong{
+  background:#e53e3e;color:#fff;border-color:#e53e3e;
+}
+/* 知识拓展模块样式 - 全统一纯白版 */
+.knowledge-section{
+    margin-top:20px;
+    border-top:1px solid #eee;
+    padding-top:15px;
+}
+.knowledge-title{
+    font-weight:bold;
+    color:#2d3748;
+    margin-bottom:10px;
+    cursor:pointer;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:8px 12px;
+    background:#f7fafc;
+    border-radius:6px;
+    position:relative;
+    padding-right:30px;
+}
+.knowledge-title:hover{
+    background:#e8f4ff;
+}
+/* 隐藏原来的文字箭头 */
+.knowledge-title > span:last-child{
+    display:none;
+}
+/* 统一灰色箭头 */
+.knowledge-title::after{
+    content:'';
+    position:absolute;
+    right:12px;
+    top:50%;
+    transform:translateY(-50%);
+    width:0;
+    height:0;
+    border-left:4px solid transparent;
+    border-right:4px solid transparent;
+    border-top:5px solid #666;
+    transition:transform 0.2s ease;
+}
+/* 展开时箭头自动旋转180度 */
+.knowledge-title.active::after{
+    transform:translateY(-50%) rotate(180deg);
+}
+.knowledge-content{
+    display:none;
+    padding:10px;
+    background:#ffffff; /* 主内容区改为纯白色 */
+    border-radius:6px;
+    margin-bottom:10px;
+}
+/* 子标题和主标题完全统一样式 */
+.knowledge-subtitle{
+    font-weight:bold;
+    color:#2d3748;
+    margin:10px 0 5px 0;
+    cursor:pointer;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:8px 12px;
+    background:#f7fafc;
+    border-radius:6px;
+    position:relative;
+    padding-right:30px;
+}
+.knowledge-subtitle:hover{
+    background:#e8f4ff;
+}
+/* 隐藏原来的文字箭头 */
+.knowledge-subtitle > span:last-child{
+    display:none;
+}
+/* 子标题箭头和主标题完全统一 */
+.knowledge-subtitle::after{
+    content:'';
+    position:absolute;
+    right:12px;
+    top:50%;
+    transform:translateY(-50%);
+    width:0;
+    height:0;
+    border-left:4px solid transparent;
+    border-right:4px solid transparent;
+    border-top:5px solid #666;
+    transition:transform 0.2s ease;
+}
+/* 展开时箭头自动旋转180度 */
+.knowledge-subtitle.active::after{
+    transform:translateY(-50%) rotate(180deg);
+}
+.knowledge-subcontent{
+    display:none;
+    padding:8px;
+    font-size:14px;
+    line-height:1.6;
+    color:#4a5568;
+    background:#ffffff; /* 子内容区也改为纯白色 */
+}
+/* 表格彻底去掉彩色背景，全表统一白底黑字 */
+.knowledge-table{
+    width:100%;
+    border-collapse:collapse;
+    margin:8px 0;
+    font-size:13px;
+}
+.knowledge-table th, .knowledge-table td{
+    border:1px solid #e2e8f0;
+    padding:6px;
+    text-align:center;
+    color:#2d3748;
+    background:#ffffff;
+}
+/* 功能按钮样式 */
+.func-btn{
+    margin:5px;
+    padding:8px 16px;
+    border:none;
+    border-radius:6px;
+    background:#e2e8f0;
+    cursor:pointer;
+    font-size:14px;
+    transition:all 0.2s;
+}
+.func-btn:hover{
+    background:#4299e1;
+    color:white;
+}
 @media (max-width:767px){
-  body{padding:10px;padding-bottom:130px;}
+  body{padding:10px;padding-bottom:100px;}
   .container{padding:15px;}
   h1{font-size:18px;}
   .mode-btn{padding:8px 14px;font-size:14px;}
-  .btns{gap:12px;padding:10px 12px;flex-wrap:wrap;}
+  .btns{gap:12px;padding:4px 12px;padding-bottom: calc(4px + env(safe-area-inset-bottom));flex-wrap:wrap;}
   #practiceBtns button{width:42px;height:42px;font-size:20px;}
-  #examBtns button{padding:8px 14px;font-size:14px;}
+  #examBtns button{width:42px;height:42px;font-size:20px;}
   .question{padding:10px;min-height:100px;}
   .question-grid{grid-template-columns:repeat(5,1fr);}
-  .stats-bar{bottom:62px;padding:6px 12px;}
+  .stats-bar{bottom:50px;padding:6px 12px;}
   .stats-number{font-size:16px;}
   .stats-text{font-size:11px;}
-  #backTop{bottom:150px;}
-  #countdownBtn{bottom:210px;}
+  #backTop{bottom:120px;}
+  #countdownBtn{bottom:180px;}
   .toast-modal.long-toast{
       min-width:240px;
       max-width:90%;
   }
   /* 移动端倒计时时间显示调整 */
   #countdownBtn.time-display{
-      font-size:10px;
+      font-size:13px;
   }
+  .knowledge-table{
+      font-size:12px;
+  }
+}
+#practiceBtns button:hover {
+    color: #4299e1;
+    background: #f0f7ff;
+}
+#practiceBtns button.active {
+    color: #e53e3e;
+    background: #fff5f5;
+}
+/* 收藏按钮基础样式（与其他按钮完全统一） */
+#practiceBtns #favorite {
+    color: #4a5568;
+    background: transparent;
+    transition: all 0.2s ease;
+}
+/* 鼠标悬停状态 */
+#practiceBtns #favorite:hover {
+    color: #4299e1;
+    background: #f0f7ff;
+}
+/* 收藏成功（激活）状态 */
+#practiceBtns #favorite.active {
+    color: #4299e1;
+    background: #f0f7ff;
+}
+/* 核心切换：线条 ↔ 实心 + 尺寸放大 */
+#favorite.active #starIcon {
+    stroke: none; /* 隐藏描边 */
+    fill: #4299e1; /* 实心填充主题蓝色 */
+    width: 30px; /* 实心图标加大两号 */
+    height: 30px;
+}
+#favorite.active #starIcon path {
+    /* 实心星星路径 */
+    d: path("M335.008 916.629333c-35.914667 22.314667-82.88 10.773333-104.693333-25.557333a77.333333 77.333333 0 0 1-8.96-57.429333l46.485333-198.24a13.141333 13.141333 0 0 0-4.021333-12.864l-152.16-132.586667c-31.605333-27.52-35.253333-75.648-8.234667-107.733333a75.68 75.68 0 0 1 51.733333-26.752L354.848 339.2c4.352-0.362667 8.245333-3.232 10.026667-7.594667l76.938666-188.170666c16.032-39.2 60.618667-57.92 99.52-41.461334a76.309333 76.309333 0 0 1 40.832 41.461334l76.938667 188.16c1.781333 4.373333 5.674667 7.253333 10.026667 7.605333l199.712 16.277333c41.877333 3.413333 72.885333 40.458667 69.568 82.517334a76.938667 76.938667 0 0 1-26.08 51.978666l-152.16 132.586667c-3.541333 3.082667-5.141333 8.074667-4.021334 12.853333l46.485334 198.24c9.621333 41.013333-15.36 82.336-56.138667 92.224a75.285333 75.285333 0 0 1-57.525333-9.237333l-170.976-106.24a11.296 11.296 0 0 0-12.010667 0l-170.986667 106.24z");
 }
 </style>
 </head>
@@ -266,6 +447,240 @@ h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
         </div>
         <div id="questions"></div>
         <div id="result"></div>
+        
+        <!-- 知识拓展模块 -->
+        <div class="knowledge-section">
+            <div class="knowledge-title" id="knowledgeToggle">
+                <span>📚 知识拓展</span>
+                <span>▼</span>
+            </div>
+            <div class="knowledge-content" id="knowledgeContent">
+                <div class="knowledge-subtitle" data-target="gmCode">
+                    <span>GM代码速查</span>
+                    <span>▼</span>
+                </div>
+                <div class="knowledge-subcontent" id="gmCode">
+                    <table class="knowledge-table">
+    <tr><th>代码</th><th>功能</th><th>模态</th></tr>
+    <!-- G代码 00-100 按数字顺序排列 -->
+    <tr><td>G00</td><td>快速点定位</td><td>是</td></tr>
+    <tr><td>G01</td><td>直线插补切削</td><td>是</td></tr>
+    <tr><td>G02</td><td>顺时针圆弧插补</td><td>是</td></tr>
+    <tr><td>G03</td><td>逆时针圆弧插补</td><td>是</td></tr>
+    <tr><td>G04</td><td>暂停延时（X秒/P毫秒）</td><td>否</td></tr>
+    <tr><td>G05</td><td>高速高精度加工模式</td><td>是</td></tr>
+    <tr><td>G09</td><td>准确停止校验（单段）</td><td>否</td></tr>
+    <tr><td>G10</td><td>可编程数据输入</td><td>否</td></tr>
+    <tr><td>G11</td><td>取消可编程数据输入</td><td>否</td></tr>
+    <tr><td>G15</td><td>取消极坐标编程</td><td>是</td></tr>
+    <tr><td>G16</td><td>极坐标编程</td><td>是</td></tr>
+    <tr><td>G17</td><td>XY平面选择</td><td>是</td></tr>
+    <tr><td>G18</td><td>XZ平面选择</td><td>是</td></tr>
+    <tr><td>G19</td><td>YZ平面选择</td><td>是</td></tr>
+    <tr><td>G20</td><td>英制单位（英寸）</td><td>是</td></tr>
+    <tr><td>G21</td><td>公制单位（毫米）</td><td>是</td></tr>
+    <tr><td>G28</td><td>自动返回机床参考点</td><td>否</td></tr>
+    <tr><td>G29</td><td>从参考点自动返回加工点</td><td>否</td></tr>
+    <tr><td>G30</td><td>返回第二/第三参考点</td><td>否</td></tr>
+    <tr><td>G40</td><td>取消刀具半径补偿</td><td>是</td></tr>
+    <tr><td>G41</td><td>刀具半径左补偿</td><td>是</td></tr>
+    <tr><td>G42</td><td>刀具半径右补偿</td><td>是</td></tr>
+    <tr><td>G43</td><td>刀具长度正补偿</td><td>是</td></tr>
+    <tr><td>G44</td><td>刀具长度负补偿</td><td>是</td></tr>
+    <tr><td>G49</td><td>取消刀具长度补偿</td><td>是</td></tr>
+    <tr><td>G50</td><td>取消比例缩放/主轴最高转速限制</td><td>是</td></tr>
+    <tr><td>G51</td><td>比例缩放功能</td><td>是</td></tr>
+    <tr><td>G50.1</td><td>取消镜像功能</td><td>是</td></tr>
+    <tr><td>G51.1</td><td>坐标轴镜像功能</td><td>是</td></tr>
+    <tr><td>G52</td><td>局部坐标系设定</td><td>否</td></tr>
+    <tr><td>G53</td><td>机床坐标系选择</td><td>否</td></tr>
+    <tr><td>G54</td><td>工件坐标系1</td><td>是</td></tr>
+    <tr><td>G55</td><td>工件坐标系2</td><td>是</td></tr>
+    <tr><td>G56</td><td>工件坐标系3</td><td>是</td></tr>
+    <tr><td>G57</td><td>工件坐标系4</td><td>是</td></tr>
+    <tr><td>G58</td><td>工件坐标系5</td><td>是</td></tr>
+    <tr><td>G59</td><td>工件坐标系6</td><td>是</td></tr>
+    <tr><td>G61</td><td>准确停止模式</td><td>是</td></tr>
+    <tr><td>G64</td><td>连续切削模式（默认）</td><td>是</td></tr>
+    <tr><td>G65</td><td>宏程序非模态调用（带参数）</td><td>否</td></tr>
+    <tr><td>G66</td><td>宏程序模态调用</td><td>是</td></tr>
+    <tr><td>G67</td><td>取消宏程序模态调用</td><td>是</td></tr>
+    <tr><td>G68</td><td>坐标系旋转功能</td><td>是</td></tr>
+    <tr><td>G69</td><td>取消坐标系旋转</td><td>是</td></tr>
+    <tr><td>G70</td><td>精车复合循环</td><td>否</td></tr>
+    <tr><td>G71</td><td>外圆/内孔粗车复合循环</td><td>否</td></tr>
+    <tr><td>G72</td><td>端面粗车复合循环</td><td>否</td></tr>
+    <tr><td>G73</td><td>仿形粗车循环/高速深孔啄钻循环</td><td>否</td></tr>
+    <tr><td>G74</td><td>端面深孔钻循环/左旋攻丝循环</td><td>否</td></tr>
+    <tr><td>G75</td><td>径向切槽/切断复合循环</td><td>否</td></tr>
+    <tr><td>G76</td><td>螺纹切削复合循环/精镗定向让刀循环</td><td>否</td></tr>
+    <tr><td>G80</td><td>取消所有固定循环</td><td>是</td></tr>
+    <tr><td>G81</td><td>普通浅孔钻孔循环</td><td>是</td></tr>
+    <tr><td>G82</td><td>带暂停沉头钻孔循环</td><td>是</td></tr>
+    <tr><td>G83</td><td>深孔啄钻排屑循环</td><td>是</td></tr>
+    <tr><td>G84</td><td>右旋攻丝循环</td><td>是</td></tr>
+    <tr><td>G85</td><td>精镗循环（工进工退）</td><td>是</td></tr>
+    <tr><td>G86</td><td>粗镗循环（主轴停退刀）</td><td>是</td></tr>
+    <tr><td>G87</td><td>背镗循环（反镗）</td><td>是</td></tr>
+    <tr><td>G88</td><td>手动退刀镗孔循环</td><td>是</td></tr>
+    <tr><td>G89</td><td>带暂停精镗循环</td><td>是</td></tr>
+    <tr><td>G90</td><td>绝对坐标编程/外圆单一循环</td><td>是</td></tr>
+    <tr><td>G91</td><td>增量坐标编程</td><td>是</td></tr>
+    <tr><td>G92</td><td>工件坐标系设定/螺纹切削单一循环</td><td>否</td></tr>
+    <tr><td>G93</td><td>时间倒数进给</td><td>是</td></tr>
+    <tr><td>G94</td><td>每分钟进给/端面切削单一循环</td><td>是</td></tr>
+    <tr><td>G95</td><td>每转进给</td><td>是</td></tr>
+    <tr><td>G96</td><td>恒线速度控制</td><td>是</td></tr>
+    <tr><td>G97</td><td>取消恒线速度控制</td><td>是</td></tr>
+    <tr><td>G98</td><td>固定循环返回初始平面</td><td>是</td></tr>
+    <tr><td>G99</td><td>固定循环返回R点平面</td><td>是</td></tr>
+
+    <!-- M代码 按数字顺序排列 -->
+    <tr><td>M00</td><td>无条件程序暂停</td><td>否</td></tr>
+    <tr><td>M01</td><td>选择性程序暂停</td><td>否</td></tr>
+    <tr><td>M02</td><td>程序结束（不返回开头）</td><td>否</td></tr>
+    <tr><td>M03</td><td>主轴正转（顺时针）</td><td>是</td></tr>
+    <tr><td>M04</td><td>主轴反转（逆时针）</td><td>是</td></tr>
+    <tr><td>M05</td><td>主轴停止</td><td>是</td></tr>
+    <tr><td>M06</td><td>自动换刀</td><td>否</td></tr>
+    <tr><td>M07</td><td>主轴吹气开启</td><td>是</td></tr>
+    <tr><td>M08</td><td>液状切削液开</td><td>是</td></tr>
+    <tr><td>M09</td><td>关闭所有切削液</td><td>是</td></tr>
+    <tr><td>M10</td><td>夹具夹紧</td><td>是</td></tr>
+    <tr><td>M11</td><td>夹具松开</td><td>是</td></tr>
+    <tr><td>M13</td><td>主轴正转+切削液开</td><td>是</td></tr>
+    <tr><td>M14</td><td>主轴反转+切削液开</td><td>是</td></tr>
+    <tr><td>M19</td><td>主轴定向准停</td><td>否</td></tr>
+    <tr><td>M28</td><td>第四轴夹紧</td><td>否</td></tr>
+    <tr><td>M29</td><td>第四轴松开</td><td>否</td></tr>
+    <tr><td>M30</td><td>程序结束并返回开头</td><td>否</td></tr>
+    <tr><td>M32</td><td>润滑泵开</td><td>是</td></tr>
+    <tr><td>M33</td><td>润滑泵关</td><td>是</td></tr>
+    <tr><td>M35</td><td>排屑机正转</td><td>是</td></tr>
+    <tr><td>M36</td><td>排屑机反转</td><td>是</td></tr>
+    <tr><td>M37</td><td>排屑机停止</td><td>是</td></tr>
+    <tr><td>M41</td><td>主轴低速档</td><td>是</td></tr>
+    <tr><td>M42</td><td>主轴高速档</td><td>是</td></tr>
+    <tr><td>M43</td><td>主轴中速档1</td><td>是</td></tr>
+    <tr><td>M44</td><td>主轴中速档2</td><td>是</td></tr>
+    <tr><td>M51</td><td>内冷切削液开</td><td>是</td></tr>
+    <tr><td>M52</td><td>内冷切削液关</td><td>是</td></tr>
+    <tr><td>M80</td><td>防护门关闭</td><td>否</td></tr>
+    <tr><td>M81</td><td>防护门打开</td><td>否</td></tr>
+    <tr><td>M82</td><td>主轴松刀</td><td>否</td></tr>
+    <tr><td>M83</td><td>主轴紧刀</td><td>否</td></tr>
+    <tr><td>M98</td><td>调用子程序（Pxxxx Lxx）</td><td>否</td></tr>
+    <tr><td>M99</td><td>子程序结束返回主程序</td><td>否</td></tr>
+
+    <!-- 字母代码（地址符）按字母顺序排列 -->
+    <tr><td>A</td><td>绕X轴旋转轴坐标值</td><td>-</td></tr>
+    <tr><td>B</td><td>绕Y轴旋转轴坐标值</td><td>-</td></tr>
+    <tr><td>C</td><td>绕Z轴旋转轴坐标值</td><td>-</td></tr>
+    <tr><td>D</td><td>刀具半径补偿号</td><td>-</td></tr>
+    <tr><td>F</td><td>进给速度</td><td>-</td></tr>
+    <tr><td>H</td><td>刀具长度补偿号</td><td>-</td></tr>
+    <tr><td>I</td><td>圆弧圆心X向增量坐标</td><td>-</td></tr>
+    <tr><td>J</td><td>圆弧圆心Y向增量坐标</td><td>-</td></tr>
+    <tr><td>K</td><td>圆弧圆心Z向增量坐标</td><td>-</td></tr>
+    <tr><td>L</td><td>子程序重复调用次数</td><td>-</td></tr>
+    <tr><td>N</td><td>程序段号</td><td>-</td></tr>
+    <tr><td>O</td><td>程序号</td><td>-</td></tr>
+    <tr><td>P</td><td>延时时间/子程序号/固定循环参数</td><td>-</td></tr>
+    <tr><td>Q</td><td>深孔钻每次切深/精镗让刀量</td><td>-</td></tr>
+    <tr><td>R</td><td>圆弧半径/固定循环R点高度</td><td>-</td></tr>
+    <tr><td>S</td><td>主轴转速</td><td>-</td></tr>
+    <tr><td>T</td><td>刀具号</td><td>-</td></tr>
+    <tr><td>X</td><td>X轴直线坐标值</td><td>-</td></tr>
+    <tr><td>Y</td><td>Y轴直线坐标值</td><td>-</td></tr>
+    <tr><td>Z</td><td>Z轴直线坐标值</td><td>-</td></tr>
+    <tr><td>#</td><td>宏程序变量</td><td>-</td></tr>
+</table>
+
+                </div>
+                
+                <div class="knowledge-subtitle" data-target="alarmInfo">
+                    <span>常见报警信息</span>
+                    <span>▼</span>
+                </div>
+                <div class="knowledge-subcontent" id="alarmInfo">
+                    <p><strong>1. 超程报警</strong>：轴移动超出硬限位，手动反向移动解除</p>
+                    <p><strong>2. 伺服过载</strong>：切削量过大或机械卡死，减小负载检查导轨</p>
+                    <p><strong>3. 气压不足</strong>：检查空压机压力，一般需0.5~0.7MPa</p>
+                    <p><strong>4. 刀库乱刀</strong>：刀库计数信号丢失，重新回零并校准刀库</p>
+                    <p><strong>5. 主轴过热</strong>：主轴冷却系统故障或长时间高负荷运行</p>
+                    <p><strong>6. 程序错误</strong>：语法错误或参数错误，检查程序代码</p>
+                    <p><strong>7. 急停报警</strong>：急停按钮被按下，旋转复位急停按钮</p>
+                    <p><strong>8. 电池电压低</strong>：系统电池电量不足，及时更换电池</p>
+                </div>
+                
+                <div class="knowledge-subtitle" data-target="drawingSymbol">
+                    <span>图纸符号速查</span>
+                    <span>▼</span>
+                </div>
+                <div class="knowledge-subcontent" id="drawingSymbol">
+                    <p><strong>Φ</strong>：直径</p>
+                    <p><strong>R</strong>：半径</p>
+                    <p><strong>SR</strong>：球面半径</p>
+                    <p><strong>SΦ</strong>：球面直径</p>
+                    <p><strong>C</strong>：45°倒角</p>
+                    <p><strong>TYP</strong>：相同结构多处</p>
+                    <p><strong>EQS</strong>：均布</p>
+                    <p><strong>THR</strong>：通孔</p>
+                    <p><strong>DEP</strong>：深度</p>
+                    <p><strong>MAX</strong>：最大值</p>
+                    <p><strong>MIN</strong>：最小值</p>
+                    <p><strong>REF</strong>：参考尺寸</p>
+                    <p><strong>⊥</strong>：垂直度</p>
+                    <p><strong>∥</strong>：平行度</p>
+                    <p><strong>◎</strong>：同轴度</p>
+                    <p><strong>○</strong>：圆度</p>
+                    <p><strong>□</strong>：平面度</p>
+                    <p><strong>↗</strong>：圆跳动</p>
+                    <p><strong>↗↗</strong>：全跳动</p>
+                    <p><strong>⌒</strong>：圆柱度</p>
+                    <p><strong>—</strong>：直线度</p>
+                    <p><strong>⊕</strong>：位置度</p>
+                </div>
+                
+                <div class="knowledge-subtitle" data-target="threadTable">
+                    <span>常用螺纹表</span>
+                    <span>▼</span>
+                </div>
+                <div class="knowledge-subcontent" id="threadTable">
+                    <table class="knowledge-table">
+                        <tr><th>螺纹规格</th><th>螺距(mm)</th><th>底孔直径(mm)</th></tr>
+                        <tr><td>M3</td><td>0.5</td><td>2.5</td></tr>
+                        <tr><td>M4</td><td>0.7</td><td>3.3</td></tr>
+                        <tr><td>M5</td><td>0.8</td><td>4.2</td></tr>
+                        <tr><td>M6</td><td>1.0</td><td>5.0</td></tr>
+                        <tr><td>M8</td><td>1.25</td><td>6.8</td></tr>
+                        <tr><td>M10</td><td>1.5</td><td>8.5</td></tr>
+                        <tr><td>M12</td><td>1.75</td><td>10.2</td></tr>
+                        <tr><td>M14</td><td>2.0</td><td>12.0</td></tr>
+                        <tr><td>M16</td><td>2.0</td><td>14.0</td></tr>
+                        <tr><td>M18</td><td>2.5</td><td>15.5</td></tr>
+                        <tr><td>M20</td><td>2.5</td><td>17.5</td></tr>
+                        <tr><td>M22</td><td>2.5</td><td>19.5</td></tr>
+                        <tr><td>M24</td><td>3.0</td><td>21.0</td></tr>
+                    </table>
+                </div>
+                
+                <div class="knowledge-subtitle" data-target="materialInfo">
+                    <span>材料速查</span>
+                    <span>▼</span>
+                </div>
+                <div class="knowledge-subcontent" id="materialInfo">
+                    <p><strong>45号钢</strong>：最常用结构钢，综合力学性能好，适合一般零件</p>
+                    <p><strong>Q235</strong>：普通碳素钢，塑性好，适合焊接件、支架</p>
+                    <p><strong>铝合金6061</strong>：轻质、耐腐蚀，适合航空、电子零件</p>
+                    <p><strong>不锈钢304</strong>：耐腐蚀、耐高温，适合食品、医疗设备</p>
+                    <p><strong>不锈钢316</strong>：耐腐蚀性更好，适合海洋环境</p>
+                    <p><strong>铸铁HT200</strong>：减震性好，适合机床床身、底座</p>
+                    <p><strong>铜H62</strong>：导电性好，适合电气零件、管件</p>
+                    <p><strong>钛合金TC4</strong>：强度高、耐腐蚀，适合航空航天</p>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 <!-- 学习统计栏（仅背题/答题模式显示） -->
@@ -287,26 +702,69 @@ h1{text-align:center;color:#2d3748;margin-bottom:20px;font-size:22px;}
         <span class="stats-text">正确率</span>
     </div>
 </div>
-<!-- 考试模式文字按钮（与顶部风格完全一致） -->
+<!-- 考试模式图标按钮（与答题模式风格完全统一） -->
 <div class="btns" id="examBtns" style="display:none;">
-    <button id="submit" title="提交试卷">交卷</button>
-    <button id="reset" title="重置答案">重置</button>
-    <button id="redo" title="重做错题">错题</button>
-    <button id="change" title="换一组题">换题</button>
+    <button id="submit" title="提交试卷">
+        <svg viewBox="195 43 634 959" width="35" height="35" fill="#4a5568">
+<path d="M725.369443 276.811868a26.304774 26.304774 0 0 0-26.7126-25.84597h-66.271718v2.701847a26.355752 26.355752 0 0 1-26.763579 25.84597H380.654553a26.610644 26.610644 0 0 1-26.763579-25.84597v-2.701847H274.72176a26.610644 26.610644 0 0 0-26.7126 25.84597v493.775278a26.304774 26.304774 0 0 0 26.7126 25.794992h211.916563L539.808632 848.0231H248.366008a52.507592 52.507592 0 0 1-53.017375-51.640962v-545.467218a51.895853 51.895853 0 0 1 53.017375-51.589983h105.98377a26.304774 26.304774 0 0 1 26.763579-25.998905H606.08035a26.610644 26.610644 0 0 1 26.712601 25.84597h92.882361a52.507592 52.507592 0 0 1 53.017375 51.640962V509.782446l-53.017375 53.934983z m-88.345298 174.855379h-300.771643a16.924777 16.924777 0 0 1-16.771843-16.313038v-16.313038a16.924777 16.924777 0 0 1 16.771843-16.313038h300.771643a16.924777 16.924777 0 0 1 16.771842 16.313038v16.313038a16.618908 16.618908 0 0 1-16.771842 16.313038z m16.771842 123.673222a16.924777 16.924777 0 0 1-16.771842 16.313038h-300.771643a16.924777 16.924777 0 0 1-16.771843-16.313038v-16.313038a16.924777 16.924777 0 0 1 16.771843-16.313039h300.771643a16.924777 16.924777 0 0 1 16.771842 16.313039z m-115.057898 116.842137a29.61836 29.61836 0 0 1 21.767711 9.532931l67.495196 62.091502 148.142779-157.67571a29.210534 29.210534 0 0 1 21.716732-9.532932 31.963359 31.963359 0 0 1 30.586947 33.084881 34.155424 34.155424 0 0 1-9.02315 23.093145l-169.706576 181.227659a29.567382 29.567382 0 0 1-43.484443 0l-89.262906-85.643451a34.155424 34.155424 0 0 1-9.023149-23.093145 31.963359 31.963359 0 0 1 30.790859-33.08488z"></path>
+</svg>
+    </button>
+    <button id="reset" title="重置答案">
+       <svg viewBox="146 73 768 951" width="25" height="25" fill="#4a5568">
+<path d="M841.142857 365.714286a36.571429 36.571429 0 0 1 35.986286 29.988571L877.714286 402.285714v512a109.714286 109.714286 0 0 1-99.181715 109.202286L768 1024h-512a109.714286 109.714286 0 0 1-109.202286-99.181714L146.285714 914.285714v-512a36.571429 36.571429 0 0 1 72.557715-6.582857L219.428571 402.285714v512a36.571429 36.571429 0 0 0 29.988572 35.986286L256 950.857143h512a36.571429 36.571429 0 0 0 35.986286-29.988572L804.571429 914.285714v-512a36.571429 36.571429 0 0 1 36.571428-36.571428z m-438.857143 73.142857a36.571429 36.571429 0 0 1 36.571429 36.571428v292.571429a36.571429 36.571429 0 1 1-73.142857 0v-292.571429a36.571429 36.571429 0 0 1 36.571428-36.571428z m219.428572 0a36.571429 36.571429 0 0 1 36.571428 36.571428v292.571429a36.571429 36.571429 0 1 1-73.142857 0v-292.571429a36.571429 36.571429 0 0 1 36.571429-36.571428z m-45.202286-365.714286c38.034286 0 73.142857 19.748571 93.110857 51.638857l5.046857 8.996572L717.458286 219.428571H914.285714a36.571429 36.571429 0 1 1 0 73.142858h-804.571428a36.571429 36.571429 0 0 1 0-73.142858h196.754285l42.861715-85.577142a109.714286 109.714286 0 0 1 87.844571-60.196572L447.488 73.142857h129.024z m0 73.142857H447.488a36.571429 36.571429 0 0 0-29.110857 14.409143l-3.657143 5.851429L388.315429 219.428571h247.442285l-26.477714-52.955428a36.571429 36.571429 0 0 0-25.892571-19.529143L576.512 146.285714z"></path>
+</svg>
+    </button>
+    <button id="redo" title="重做错题">
+        <svg viewBox="36 0 943 1024" width="24" height="24" fill="#4a5568">
+<path d="M979.334095 366.128762a36.571429 36.571429 0 0 0-36.571428 36.571428v489.935239A58.294857 58.294857 0 0 1 884.540952 950.857143H510.293333a36.571429 36.571429 0 0 0 0 73.142857h374.247619a131.510857 131.510857 0 0 0 131.364572-131.364571V402.70019a36.571429 36.571429 0 0 0-36.571429-36.571428M884.540952 0H233.984a131.535238 131.535238 0 0 0-131.388952 131.388952v149.089524H36.571429a36.571429 36.571429 0 0 0 0 73.142857h66.023619v316.757334H36.571429a36.571429 36.571429 0 1 0 0 73.142857h66.023619v149.089524A131.535238 131.535238 0 0 0 233.984 1024h69.38819a36.571429 36.571429 0 1 0 0-73.142857H233.984a58.319238 58.319238 0 0 1-58.246095-58.246095v-149.089524h59.562666a36.571429 36.571429 0 1 0 0-73.142857H175.737905V353.621333h59.562666a36.571429 36.571429 0 1 0 0-73.142857H175.737905V131.388952A58.319238 58.319238 0 0 1 233.984 73.142857h650.532571a58.319238 58.319238 0 0 1 58.246096 58.246095v91.769905a36.571429 36.571429 0 0 0 73.142857 0V131.388952A131.510857 131.510857 0 0 0 884.516571 0"></path>
+<path d="M591.11619 563.712l105.496381 105.496381a36.425143 36.425143 0 0 0 51.687619 0 36.571429 36.571429 0 0 0 0-51.687619L642.852571 512l105.496381-105.496381a36.571429 36.571429 0 1 0-51.712-51.687619l-105.496381 105.472-105.496381-105.496381a36.571429 36.571429 0 1 0-51.712 51.712L539.40419 512l-105.49638 105.496381a36.571429 36.571429 0 1 0 51.687619 51.712l105.520761-105.496381z"></path>
+</svg>
+    </button>
+    <button id="change" title="换一组题">
+        <svg viewBox="0 0 1024 1024" width="28" height="28" fill="#4a5568">
+<path d="M613.575 160.164c97.72 9.837 176.229 68.661 192.912 169.604h-56.538l91.253 136.037 91.422-135.974h-63.068C852.872 193.868 749.95 105.416 620.021 92.851c-17.947-1.412-34.715 14.04-34.715 33.693 1.179 16.852 12.765 32.155 28.269 33.62zM472.156 91.376H154.371c-17.958 0-32.135 15.44-32.135 35.094v302.84c0 19.654 14.103 35.021 32.135 35.021h317.648c18.021 0 32.124-15.44 32.124-35.094V126.544c0-19.654-14.103-35.105-32.124-35.105h0.137v-0.063z m-61.879 771.187c-109.295-9.816-192.912-82.765-196.841-203.276h60.467l-91.19-136.059-91.337 135.911h60.467c2.528 155.69 111.823 256.634 252.126 270.663 17.958 1.432 34.726-14.029 34.726-33.684 0.263-16.726-11.817-31.112-28.343-33.683l-0.075 0.128z m460.542-304.304c16.705 0 32.062 15.504 32.062 35.094v304.24c0 19.591-14.093 35.031-32.124 35.031H553.119c-18.116 0-32.146-15.44-32.146-35.094V593.353c0-19.506 14.029-35.01 32.146-35.01h317.7v-0.084z m-46.995 56.221H599.841c-12.724 0-22.666 10.954-22.666 24.709v214.609c0 13.819 9.942 24.772 22.666 24.772h224.046c12.702 0 22.666-10.953 22.666-24.772V639.189c0-13.755-10.807-24.709-22.581-24.709h-0.148z m-398.39-467.514h0.074c11.786 0 22.655 10.954 22.582 24.709v214.672c0 13.829-9.953 24.772-22.655 24.772h-224.13c-12.702 0-22.655-10.943-22.655-24.772V171.675c0-13.755 9.953-24.709 22.655-24.709h224.129z"></path>
+</svg>
+    </button>
 </div>
 <!-- 练习模式图标按钮（保持不变） -->
 <div class="btns" id="practiceBtns">
-    <button id="prev" title="上一题">←</button>
-    <button id="next" title="下一题">→</button>
-    <button id="allList" title="题目列表">☰</button>
-    <button id="clearPractice" title="清空答案">✕</button>
+    <button id="prev" title="上一题">
+    <svg viewBox="195 43 634 959" width="27" height="27" fill="#4a5568">
+        <path d="M146.5344 536.132267a34.133333 34.133333 0 0 1 0-48.264534l307.2-307.2a34.133333 34.133333 0 1 1 48.264533 48.264534L253.064533 477.866667H853.333333a34.133333 34.133333 0 1 1 0 68.266666H253.064533l248.9344 248.9344a34.133333 34.133333 0 0 1-48.264533 48.264534l-307.2-307.2z"></path>
+    </svg>
+</button>
+    <button id="next" title="下一题">
+    <svg viewBox="195 43 634 959" width="27" height="27" fill="#4a5568">
+        <path d="M877.4656 487.867733a34.133333 34.133333 0 0 1 0 48.264534l-307.2 307.2a34.133333 34.133333 0 0 1-48.264533-48.264534L770.935467 546.133333H170.666667a34.133333 34.133333 0 1 1 0-68.266666h600.2688l-248.9344-248.9344a34.133333 34.133333 0 0 1 48.264533-48.264534l307.2 307.2z"></path>
+    </svg>
+</button>
+    <button id="allList" title="题目列表">
+        <svg viewBox="195 43 634 959" width="28" height="28" fill="#4a5568">
+            <path d="M368.2304 483.7888H256.1536c-66.2016 0-120.0128-53.8624-120.0128-120.0128V251.6992c0-66.2016 53.8624-120.0128 120.0128-120.0128h112.0768c66.2016 0 120.0128 53.8624 120.0128 120.0128v112.0768c0 66.2016-53.8624 120.0128-120.0128 120.0128zM256.1536 193.1264c-32.3072 0-58.5728 26.2656-58.5728 58.5728v112.0768c0 32.3072 26.2656 58.5728 58.5728 58.5728h112.0768c32.3072 0 58.5728-26.2656 58.5728-58.5728V251.6992c0-32.3072-26.2656-58.5728-58.5728-58.5728H256.1536zM368.2304 893.6448H256.1536c-66.2016 0-120.0128-53.8624-120.0128-120.0128v-112.0768c0-66.2016 53.8624-120.0128 120.0128-120.0128h112.0768c66.2016 0 120.0128 53.8624 120.0128 120.0128v112.0768c0 66.1504-53.8624 120.0128-120.0128 120.0128z m-112.0768-290.7136c-32.3072 0-58.5728 26.2656-58.5728 58.5728v112.0768c0 32.3072 26.2656 58.5728 58.5728 58.5728h112.0768c32.3072 0 58.5728-26.2656 58.5728-58.5728V661.504c0-32.3072-26.2656-58.5728-58.5728-58.5728H256.1536zM774.5024 893.6448h-112.0768c-66.2016 0-120.0128-53.8624-120.0128-120.0128v-112.0768c0-66.2016 53.8624-120.0128 120.0128-120.0128h112.0768c66.2016 0 120.0128 53.8624 120.0128 120.0128v112.0768c0 66.1504-53.8112 120.0128-120.0128 120.0128z m-112.0768-290.7136c-32.3072 0-58.5728 26.2656-58.5728 58.5728v112.0768c0 32.3072 26.2656 58.5728 58.5728 58.5728h112.0768c32.3072 0 58.5728-26.2656 58.5728-58.5728V661.504c0-32.3072-26.2656-58.5728-58.5728-58.5728h-112.0768z M718.4896 493.7728c-30.72 0-61.4912-11.7248-84.8896-35.1232l-66.0992-66.048c-46.7968-46.7968-46.7968-122.9312 0-169.728l66.0992-66.0992c46.7968-46.7968 122.9312-46.7968 169.728 0l66.048 66.048c46.7968 46.7968 46.7968 122.9312 0 169.728l-66.048 66.048c-23.3984 23.5008-54.1184 35.1744-84.8384 35.1744z m0-310.6304c-15.0016 0-30.0032 5.7344-41.4208 17.152l-66.0992 66.0992c-22.8352 22.8352-22.8352 60.0064 0 82.8416l66.0992 66.048c22.8352 22.8352 60.0064 22.8352 82.8416 0l66.048-66.048c22.8352-22.8352 22.8352-60.0064 0-82.8416l-66.048-66.048a58.05056 58.05056 0 0 0-41.4208-17.2032z"></path>
+        </svg>
+    </button>
+    <button id="favorite" title="收藏本题">
+    <svg id="starIcon" viewBox="0 0 1024 1024" width="27" height="27" fill="none" stroke="#4a5568" stroke-width="70">
+        <path d="M335.008 916.629333c-35.914667 22.314667-82.88 10.773333-104.693333-25.557333a77.333333 77.333333 0 0 1-8.96-57.429333l46.485333-198.24a13.141333 13.141333 0 0 0-4.021333-12.864l-152.16-132.586667c-31.605333-27.52-35.253333-75.648-8.234667-107.733333a75.68 75.68 0 0 1 51.733333-26.752L354.848 339.2c4.352-0.362667 8.245333-3.232 10.026667-7.594667l76.938666-188.170666c16.032-39.2 60.618667-57.92 99.52-41.461334a76.309333 76.309333 0 0 1 40.832 41.461334l76.938667 188.16c1.781333 4.373333 5.674667 7.253333 10.026667 7.605333l199.712 16.277333c41.877333 3.413333 72.885333 40.458667 69.568 82.517334a76.938667 76.938667 0 0 1-26.08 51.978666l-152.16 132.586667c-3.541333 3.082667-5.141333 8.074667-4.021334 12.853333l46.485334 198.24c9.621333 41.013333-15.36 82.336-56.138667 92.224a75.285333 75.285333 0 0 1-57.525333-9.237333l-170.976-106.24a11.296 11.296 0 0 0-12.010667 0l-170.986667 106.24z"></path>
+    </svg>
+</button>
+    <button id="clearPractice" title="清空答案">
+        <svg viewBox="195 43 634 959" width="24" height="24" fill="#4a5568">
+            <path d="M841.142857 365.714286a36.571429 36.571429 0 0 1 35.986286 29.988571L877.714286 402.285714v512a109.714286 109.714286 0 0 1-99.181715 109.202286L768 1024h-512a109.714286 109.714286 0 0 1-109.202286-99.181714L146.285714 914.285714v-512a36.571429 36.571429 0 0 1 72.557715-6.582857L219.428571 402.285714v512a36.571429 36.571429 0 0 0 29.988572 35.986286L256 950.857143h512a36.571429 36.571429 0 0 0 35.986286-29.988572L804.571429 914.285714v-512a36.571429 36.571429 0 0 1 36.571428-36.571428z m-438.857143 73.142857a36.571429 36.571429 0 0 1 36.571429 36.571428v292.571429a36.571429 36.571429 0 1 1-73.142857 0v-292.571429a36.571429 36.571429 0 0 1 36.571428-36.571428z m219.428572 0a36.571429 36.571429 0 0 1 36.571428 36.571428v292.571429a36.571429 36.571429 0 1 1-73.142857 0v-292.571429a36.571429 36.571429 0 0 1 36.571429-36.571428z m-45.202286-365.714286c38.034286 0 73.142857 19.748571 93.110857 51.638857l5.046857 8.996572L717.458286 219.428571H914.285714a36.571429 36.571429 0 1 1 0 73.142858h-804.571428a36.571429 36.571429 0 0 1 0-73.142858h196.754285l42.861715-85.577142a109.714286 109.714286 0 0 1 87.844571-60.196572L447.488 73.142857h129.024z m0 73.142857H447.488a36.571429 36.571429 0 0 0-29.110857 14.409143l-3.657143 5.851429L388.315429 219.428571h247.442285l-26.477714-52.955428a36.571429 36.571429 0 0 0-25.892571-19.529143L576.512 146.285714z"></path>
+        </svg>
+    </button>
 </div>
 <button id="backTop" title="返回顶部">↑</button>
-<!-- 简约沙漏风格倒计时图标 -->
+<!-- 简约三角形风格倒计时图标 -->
 <button id="countdownBtn" title="开始考试倒计时">▶</button>
 <div class="list-modal" id="listModal">
     <div class="list-box">
-        <div class="list-title">全部题目列表（共500题）</div>
+        <div class="list-title" id="listTitle">全部题目列表（共500题）</div>
+        <div style="text-align:center;margin-bottom:10px;">
+            <button class="func-btn" id="randomBtn">随机刷题</button>
+            <button class="func-btn" id="wrongBtn">查看错题</button>
+            <button class="func-btn" id="favoriteBtn">我的收藏</button>
+        </div>
         <div class="question-grid" id="questionGrid"></div>
     </div>
 </div>
@@ -920,6 +1378,45 @@ var touchStartX = 0;
 var touchEndX = 0;
 var touchStartY = 0;
 var touchEndY = 0;
+// 新增功能变量
+var favorites = []; // 收藏的题目索引
+var wrongQuestions = []; // 错题记录
+var currentListType = "all"; // 当前列表类型：all-全部, random-随机, wrong-错题, favorite-收藏
+// 本地存储相关函数
+function saveToLocalStorage() {
+    try {
+        var data = {
+            practiceAnswers: practiceAnswers,
+            practiceJudge: practiceJudge,
+            favorites: favorites,
+            wrongQuestions: wrongQuestions,
+            currentCategory: currentCategory,
+            currentPracticeIndex: currentPracticeIndex
+        };
+        localStorage.setItem('cncTestData', JSON.stringify(data));
+    } catch(e) {
+        console.error('本地存储失败:', e);
+    }
+}
+function loadFromLocalStorage() {
+    try {
+        var data = localStorage.getItem('cncTestData');
+        if(data) {
+            var parsed = JSON.parse(data);
+            practiceAnswers = parsed.practiceAnswers || {};
+            practiceJudge = parsed.practiceJudge || {};
+            favorites = parsed.favorites || [];
+            wrongQuestions = parsed.wrongQuestions || [];
+            currentCategory = parsed.currentCategory || "all";
+            currentPracticeIndex = parsed.currentPracticeIndex || 0;
+            
+            // 设置分类选择器
+            categorySelect.value = currentCategory;
+        }
+    } catch(e) {
+        console.error('本地存储读取失败:', e);
+    }
+}
 // 更新学习统计数据
 function updateStats() {
     var bank = getCateBank();
@@ -943,6 +1440,9 @@ function updateStats() {
     document.getElementById('answered').textContent = answered;
     document.getElementById('wrong').textContent = wrong;
     document.getElementById('accuracy').textContent = accuracy + '%';
+    
+    // 保存到本地存储
+    saveToLocalStorage();
 }
 // 格式化倒计时时间
 function formatTime(seconds) {
@@ -956,7 +1456,7 @@ function toggleCountdown() {
         // 暂停倒计时
         clearInterval(countdownTimer);
         countdownRunning = false;
-        countdownBtn.textContent = '︎▶︎';
+        countdownBtn.textContent = '▶︎';
         removeClass(countdownBtn, 'time-display');
         removeClass(countdownBtn, 'active');
         showToast("考试倒计时已暂停");
@@ -1079,6 +1579,145 @@ function handleSwipe() {
         }
     }
 }
+// 收藏功能
+function toggleFavorite() {
+    var bank = getCateBank();
+    var questionId = bank[currentPracticeIndex].q; // 使用题目内容作为唯一标识
+    
+    var index = favorites.indexOf(questionId);
+    if(index === -1) {
+        favorites.push(questionId);
+        addClass(document.getElementById('favorite'), 'active');
+        showToast("已收藏本题");
+    } else {
+        favorites.splice(index, 1);
+        removeClass(document.getElementById('favorite'), 'active');
+        showToast("已取消收藏");
+    }
+    
+    saveToLocalStorage();
+}
+// 检查当前题目是否已收藏
+function checkFavoriteStatus() {
+    var bank = getCateBank();
+    if(bank.length === 0) return;
+    
+    var questionId = bank[currentPracticeIndex].q;
+    var favoriteBtn = document.getElementById('favorite');
+    
+    if(favorites.indexOf(questionId) !== -1) {
+        addClass(favoriteBtn, 'active');
+    } else {
+        removeClass(favoriteBtn, 'active');
+    }
+}
+// 随机刷题功能
+function randomPractice() {
+    var bank = getCateBank();
+    if(bank.length === 0) {
+        showToast("当前分类没有题目");
+        return;
+    }
+    
+    var randomIndex = Math.floor(Math.random() * bank.length);
+    currentPracticeIndex = randomIndex;
+    currentListType = "random";
+    renderPractice();
+    listModal.style.display = "none";
+    showToast("随机抽取第" + (randomIndex + 1) + "题");
+}
+// 查看错题功能
+function showWrongQuestions() {
+    var bank = getCateBank();
+    var wrongBank = [];
+    
+    // 筛选当前分类下的错题
+    for(var i=0; i<bank.length; i++) {
+        if(practiceJudge[i] === false) {
+            wrongBank.push(i);
+        }
+    }
+    
+    if(wrongBank.length === 0) {
+        showToast("当前分类没有错题");
+        return;
+    }
+    
+    currentListType = "wrong";
+    // 显示错题列表
+    questionGrid.innerHTML = "";
+    document.getElementById('listTitle').textContent = "错题列表（共" + wrongBank.length + "题）";
+    
+    for(var i=0; i<wrongBank.length; i++){
+        var btn=document.createElement('button');
+        btn.innerText=wrongBank[i]+1;
+        btn.className = "wrong";
+        btn.addEventListener('click', (function(idx){
+            return function(){
+                currentPracticeIndex=idx;
+                renderPractice();
+                listModal.style.display="none";
+            };
+        })(wrongBank[i]));
+        questionGrid.appendChild(btn);
+    }
+}
+// 查看收藏功能
+function showFavorites() {
+    var bank = getCateBank();
+    var favoriteBank = [];
+    
+    // 筛选当前分类下的收藏题目
+    for(var i=0; i<bank.length; i++) {
+        if(favorites.indexOf(bank[i].q) !== -1) {
+            favoriteBank.push(i);
+        }
+    }
+    
+    if(favoriteBank.length === 0) {
+        showToast("当前分类没有收藏题目");
+        return;
+    }
+    
+    currentListType = "favorite";
+    // 显示收藏列表
+    questionGrid.innerHTML = "";
+    document.getElementById('listTitle').textContent = "我的收藏（共" + favoriteBank.length + "题）";
+    
+    for(var i=0; i<favoriteBank.length; i++){
+        var btn=document.createElement('button');
+        btn.innerText=favoriteBank[i]+1;
+        btn.className = "answered";
+        btn.addEventListener('click', (function(idx){
+            return function(){
+                currentPracticeIndex=idx;
+                renderPractice();
+                listModal.style.display="none";
+            };
+        })(favoriteBank[i]));
+        questionGrid.appendChild(btn);
+    }
+}
+// 知识拓展折叠功能 - 仅改箭头版
+function initKnowledgeToggle() {
+    // 主折叠
+    document.getElementById('knowledgeToggle').addEventListener('click', function() {
+        var content = document.getElementById('knowledgeContent');
+        this.classList.toggle('active');
+        content.style.display = content.style.display === 'block' ? 'none' : 'block';
+    });
+    
+    // 子折叠
+    var subtitles = document.querySelectorAll('.knowledge-subtitle');
+    for(var i=0; i<subtitles.length; i++) {
+        subtitles[i].addEventListener('click', function() {
+            var targetId = this.getAttribute('data-target');
+            var content = document.getElementById(targetId);
+            this.classList.toggle('active');
+            content.style.display = content.style.display === 'block' ? 'none' : 'block';
+        });
+    }
+}
 // 初始化函数
 function initApp() {
     try {
@@ -1095,6 +1734,9 @@ function initApp() {
         statsBar = document.getElementById('statsBar');
         countdownBtn = document.getElementById('countdownBtn');
         
+        // 加载本地存储数据
+        loadFromLocalStorage();
+        
         // 绑定倒计时按钮事件
         countdownBtn.addEventListener('click', toggleCountdown);
         
@@ -1109,6 +1751,7 @@ function initApp() {
             practiceAnswers = {};
             practiceJudge = {};
             currentPracticeIndex = 0;
+            currentListType = "all";
             if(mode === "exam"){
                 resetCountdown();
                 getNewExamBatch();
@@ -1118,6 +1761,7 @@ function initApp() {
                 renderPractice();
                 updateStats(); // 更新统计
             }
+            saveToLocalStorage();
         });
         
         // 绑定模式切换事件
@@ -1133,6 +1777,7 @@ function initApp() {
                 practiceAnswers = {};
                 practiceJudge = {};
                 currentPracticeIndex = 0;
+                currentListType = "all";
                 
                 // 清除之前的提示
                 if(toastTimer) clearTimeout(toastTimer);
@@ -1162,6 +1807,7 @@ function initApp() {
                     renderPractice();
                     updateStats(); // 更新统计
                 }
+                saveToLocalStorage();
             });
         }
         
@@ -1268,10 +1914,20 @@ function initApp() {
         document.getElementById('clearPractice').addEventListener('click', clearPracticeAll);
         
         document.getElementById('allList').addEventListener('click', function(){
+            currentListType = "all";
             initQuestionList();
+            document.getElementById('listTitle').textContent = "全部题目列表（共" + getCateBank().length + "题）";
             updateQuestionGridMark();
             listModal.style.display="flex";
         });
+        
+        // 绑定收藏按钮事件
+        document.getElementById('favorite').addEventListener('click', toggleFavorite);
+        
+        // 绑定随机刷题、错题、收藏按钮事件
+        document.getElementById('randomBtn').addEventListener('click', randomPractice);
+        document.getElementById('wrongBtn').addEventListener('click', showWrongQuestions);
+        document.getElementById('favoriteBtn').addEventListener('click', showFavorites);
         
         listModal.addEventListener('click', function(e){
             if(e.target===listModal) listModal.style.display="none";
@@ -1285,6 +1941,9 @@ function initApp() {
             document.documentElement.scrollTop = 0;
             document.body.scrollTop = 0;
         });
+        
+        // 初始化知识拓展折叠功能
+        initKnowledgeToggle();
         
         // 初始化
         initQuestionList();
@@ -1419,9 +2078,15 @@ function renderPractice(){
     progressBar.style.width = percent+"%";
     updateQuestionGridMark();
     
+    // 检查收藏状态
+    checkFavoriteStatus();
+    
     // 滚动到顶部
     document.documentElement.scrollTop = 0;
     document.body.scrollTop = 0;
+    
+    // 保存到本地存储
+    saveToLocalStorage();
 }
 function checkPracticeAnswer(){
     var bank = getCateBank();
@@ -1433,6 +2098,19 @@ function checkPracticeAnswer(){
     practiceAnswers[currentPracticeIndex] = v;
     var isRight = (v === item.ans);
     practiceJudge[currentPracticeIndex] = isRight;
+    
+    // 记录错题
+    if(!isRight) {
+        if(wrongQuestions.indexOf(currentPracticeIndex) === -1) {
+            wrongQuestions.push(currentPracticeIndex);
+        }
+    } else {
+        // 如果答对了，从错题中移除
+        var idx = wrongQuestions.indexOf(currentPracticeIndex);
+        if(idx !== -1) {
+            wrongQuestions.splice(idx, 1);
+        }
+    }
     
     var qdom = document.querySelector('.question');
     removeClass(qdom, 'correct');
@@ -1449,8 +2127,14 @@ function updateQuestionGridMark(){
         var btn = btns[i];
         removeClass(btn, 'answered');
         removeClass(btn, 'current');
+        removeClass(btn, 'wrong');
+        
         if(practiceAnswers[i] !== undefined && i < bank.length){
-            addClass(btn, 'answered');
+            if(practiceJudge[i] === false) {
+                addClass(btn, 'wrong');
+            } else {
+                addClass(btn, 'answered');
+            }
         }
         if(i === currentPracticeIndex && i < bank.length){
             addClass(btn, 'current');
@@ -1460,6 +2144,7 @@ function updateQuestionGridMark(){
 function clearPracticeAll(){
     practiceAnswers = {};
     practiceJudge = {};
+    wrongQuestions = [];
     renderPractice();
     updateQuestionGridMark();
     updateStats(); // 清空后更新统计
