@@ -4151,6 +4151,49 @@ notice.addEventListener('animationiteration', () => {
 });
 </script>
 
+<script>
+// 1. 禁用右键菜单
+document.addEventListener('contextmenu', e => e.preventDefault());
+
+// 2. 禁止选中文字、复制
+document.addEventListener('selectstart', e => e.preventDefault());
+
+// 3. 拦截调试快捷键 F12 / Ctrl+U / Ctrl+Shift+I / Ctrl+Shift+C / Ctrl+Shift+J
+document.addEventListener('keydown', e => {
+  const k = e.key.toLowerCase();
+  if (
+    e.key === 'F12' ||
+    (e.ctrlKey && k === 'u') ||
+    (e.ctrlKey && e.shiftKey && ['i','c','j'].includes(k))
+  ) {
+    e.preventDefault();
+    return false;
+  }
+});
+
+// 4. 检测开发者工具打开，自动刷新页面干扰查看
+(function() {
+  let devOpen = false;
+  const check = () => {
+    const before = new Date();
+    debugger;
+    if (new Date() - before > 150) devOpen = true;
+    if (devOpen) window.location.reload();
+  };
+  setInterval(check, 1200);
+})();
+</script>
+
+<style>
+/* CSS层面禁止页面选中文字 */
+body {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+</style>
+	
 <div class="footer-info">
     作者：数控阿宇 &nbsp; 抖音号：<a href="https://v.douyin.com/7jnbDiZ4w0w/" target="_blank">83897603411</a><br>
     数控知识库学习系统 v3.0
