@@ -18,19 +18,28 @@
 <!-- 预加载默认分类题库，首屏请求提前启动 -->
 <link rel="preload" href="./data/program-code.json" as="fetch" type="application/json" crossorigin="anonymous">
 <!-- 数控题库 Favicon 图标配置 -->
-<!-- 迅雷浏览器专属图标 -->
-<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-<link rel="icon" href="/favicon.ico" type="image/x-icon">
-<!-- 其他现代浏览器 -->
-<link rel="icon" type="image/png" sizes="16x16" href="/cnc/favicons/favicon-16x16.png">
-<link rel="icon" type="image/png" sizes="32x32" href="/cnc/favicons/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="96x96" href="/cnc/favicons/favicon-96x96.png">
-<link rel="icon" type="image/svg+xml" href="/cnc/favicons/favicon.svg">
-<link rel="shortcut icon" href="/favicon.ico">
-<link rel="apple-touch-icon" sizes="180x180" href="/cnc/favicons/apple-touch-icon.png">
-<link rel="manifest" href="/cnc/favicons/site.webmanifest">
-<meta name="msapplication-config" content="/cnc/favicons/browserconfig.xml">
+<link rel="icon" href="/favicon/favicon.ico" sizes="any">
+<link rel="icon" type="image/svg+xml" href="/favicon/favicon.svg">
+<link rel="icon" type="image/png" href="/favicon/favicon-16x16.png" sizes="16x16">
+<link rel="icon" type="image/png" href="/favicon/favicon-32x32.png" sizes="32x32">
+<link rel="icon" type="image/png" href="/favicon/favicon-48x48.png" sizes="48x48">
+
+<!-- iPhone / iPad 全尺寸桌面图标 -->
+<link rel="apple-touch-icon" href="/favicon/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="152x152" href="/favicon/apple-touch-icon-152x152.png">
+<link rel="apple-touch-icon" sizes="167x167" href="/favicon/apple-touch-icon-167x167.png">
+<link rel="apple-touch-icon" sizes="180x180" href="/favicon/apple-touch-icon-180x180.png">
+
+<!-- 安卓PWA桌面图标 -->
+<link rel="icon" type="image/png" sizes="192x192" href="/favicon/android-chrome-192x192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="/favicon/android-chrome-512x512.png">
+
+<!-- Safari固定标签图标 -->
+<link rel="mask-icon" href="/favicon/safari-pinned-tab.svg" color="#3388ee">
 <meta name="theme-color" content="#ffffff">
+
+<!-- PWA配置清单 -->
+<link rel="manifest" href="/favicon/site.webmanifest">
 <title>数控考练通·学技更轻松-CNC答题库在线网站</title>
 <style>
 *{box-sizing:border-box;font-family:"Microsoft YaHei",sans-serif;margin:0;padding:0;}
