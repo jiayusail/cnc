@@ -1,6 +1,18 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
+<script src="https://cdn.jsdelivr.net/npm/disable-devtool@3.1.4/disable-devtool.min.js"></script>
+<script>
+disableDevtool({
+  url: "about:blank",     // 打开调试直接空白页
+  clearLog: true,         // 清空控制台所有输出
+  disableMenu: true,      // 禁用右键菜单
+  disableCopy: true,      // 禁止复制题目
+  disableCut: true,       // 禁止剪切
+  disableSelect: true,    // 禁止选中文字
+  interval: 200,          // 检测频率更快，一打开立刻拦截
+})
+</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
