@@ -1768,6 +1768,12 @@ window.onerror = function(message, source, lineno, colno, error) {
 	var toastTimer = null;
 	var longToastActive = false;
 	var currentToast = null;
+	
+	// 答对自动下一题定时器
+	var autoNextTimer = null;
+	// 答对后自动切换延迟时间（单位：毫秒，1000 = 1秒，可自行调整手感）
+	var AUTO_NEXT_DELAY = 1000;
+
 	// 自动消失提示函数（可自定义时长，默认2秒）- 中央悬浮显示
 function showToast(text, duration) {
     if(longToastActive) return;
@@ -2971,7 +2977,8 @@ function initQuestionFeatures() {
         
         // 绑定练习模式按钮事件
         document.getElementById('prev').addEventListener('click', function(){
-            var bank = getCateBank();
+            if (autoNextTimer) clearTimeout(autoNextTimer); // 新增此行
+			var bank = getCateBank();
             if (isRandomMode) {
                 currentPracticeIndex = getRandomNextIndex();
             } else {
@@ -2988,6 +2995,7 @@ function initQuestionFeatures() {
         });
         
         document.getElementById('next').addEventListener('click', function(){
+			if (autoNextTimer) clearTimeout(autoNextTimer); // 新增此行
             var bank = getCateBank();
             if (isRandomMode) {
                 currentPracticeIndex = getRandomNextIndex();
@@ -3590,6 +3598,39 @@ function checkPracticeAnswer(){
     
     analysis.style.display = 'block';
     updateQuestionGridMark();
+	// ========== 新增：答对自动切换下一题 ==========
+    if (mode === "practice") {
+        // 先清除已有定时器，防止快速点选导致多次跳转
+        if (autoNextTimer) clearTimeout(autoNextTimer);
+
+        if (isRight) {
+            var bank = getCateBank();
+            var hasNext = false;
+
+            if (isRandomMode) {
+                // 随机刷题模式：题库总数>1就继续抽题
+                hasNext = bank.length > 1;
+            } else {
+                // 顺序刷题模式：非最后一题就继续
+                hasNext = currentPracticeIndex < bank.length - 1;
+            }
+
+            if (hasNext) {
+                autoNextTimer = setTimeout(function() {
+                    if (isRandomMode) {
+                        currentPracticeIndex = getRandomNextIndex();
+                    } else {
+                        currentPracticeIndex++;
+                    }
+                    // 同步答题模式独立索引
+                    practiceIndex = currentPracticeIndex;
+                    renderPractice();
+                }, AUTO_NEXT_DELAY);
+            }
+            // 最后一题答对后不自动跳转，停留在当前页
+        }
+    }
+    // ========== 新增结束 ==========
     updateStats(); // 答题后更新统计
 }
 function updateQuestionGridMark(){
